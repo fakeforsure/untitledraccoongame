@@ -263,22 +263,6 @@ void keyPressed() {
       enterDoor("scene2", 300, 300);
     }
   }
-  
-  // Dash on Shift
-  //if (key == CODED && keyCode == SHIFT && !player.isDashing) {
-  //  player.isDashing = true;
-  //  player.dashTime = 0;
-  //  PVector dir = new PVector(0, 0);
-  //  if (left) dir.x -= 1;
-  //  if (right) dir.x += 1;
-  //  if (dir.mag() > 0) {
-  //    dir.normalize();
-  //    player.dashDirection = dir;
-  //  } 
-  //  else {
-  //    player.dashDirection = new PVector(0, -1);
-  //  }
-  //}
 }
 
 // on key release

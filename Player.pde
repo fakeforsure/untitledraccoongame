@@ -6,11 +6,6 @@ class Player extends Character {
   float gravity = 0.8;
   boolean grounded = false;
   boolean facingLeft = false;
-  boolean isDashing = false;
-  PVector dashDirection;
-  int dashTime = 0;
-  int maxDashTime = 15;
-  float dashSpeed = 20;
   
   // Calculate angle
   boolean touching(Platform p) {
@@ -38,18 +33,6 @@ class Player extends Character {
     grounded = false;
     velocity.y += gravity;
     velocity.x *= damp;
-    
-    // Dashing
-    // if (isDashing) {
-    //   float totalDash = (float) dashTime / maxDashTime;
-    //   float easingDash = sin(totalDash * PI);
-    //   PVector dashStep = dashDirection.copy().mult(dashSpeed * easingDash);
-    //   position.add(dashStep);
-    //   dashTime++;
-    //   if (dashTime >= maxDashTime) {
-    //     isDashing = false;
-    //   }
-    // }
   
     // Check Position
     position.x += velocity.x;
