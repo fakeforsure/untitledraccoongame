@@ -30,6 +30,16 @@ PImage[] playerSarahAttack = new PImage[6];
 
 // Other Image Varibles
 PImage bgScene1_Room;
+PImage key_f;
+
+// Scene Doors
+boolean playerAtDoor = false;
+
+// - Scene 1
+float doorX = 227;
+float doorY = 284;
+float doorW = 92;
+float doorH = 132;
 
 // Setup
 void setup() {
@@ -60,6 +70,9 @@ void setup() {
   
   // Setup Scene Images
   bgScene1_Room = loadImage("bg/bgScene1_Room.png");
+  
+  // Setup Scene Images
+  key_f = loadImage("keyboard_f_outline.png");
 }
 
 void draw() {
@@ -71,6 +84,8 @@ void draw() {
       break; // XXX FOR NOW
     case "scene1":
       background(bgScene1_Room);
+      // Home, MC wakes up, basic intro of student life
+      // Gameplay: moving character WASD
       
       // Platform
       platforms.clear();
@@ -95,21 +110,33 @@ void draw() {
         }
       }
       
-      // Player
-      updateMovement();
-      player.update();
-      if (attacking && attackAnimation.finished) {
-        attacking = false;
-        player.sprite = spriteBeforeAttack;
+      // Draw Door (only when in debug mode)
+      if (debugMode) {
+        fill(#00FF00);
+        rectMode(CORNER);
+        rect(doorX, doorY, doorW, doorH);
       }
-      player.drawCharacter();
-      player.drawCollisionBox();
-      // Home, MC wakes up, basic intro of student life
-      // Gameplay: moving character WASD
+      playerAtDoor = isPlayerAtDoor();
+      if (playerAtDoor) {
+        image(key_f, doorX + doorW, doorY + (doorH/4));
+      }
       break; // XXX FOR NOW
     case "scene2":
+      background(255);
       // While transiting, racoon steals UPass
       // Gameplay: moving character WASD
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 656, 1280, 64, 0, #FFFF00);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
       break; // XXX FOR NOW
     case "scene3":
       // Student chases racoon into sewer
@@ -124,9 +151,19 @@ void draw() {
       break; // XXX FOR NOW
     case "scene6":
       // Arrive at classroom in AQ, but the racoon is there
-      // Gameplay: ^Mostly moving character WASD + story wrapup
+      // Gameplay: Mostly moving character WASD + story wrapup
       break; // XXX FOR NOW
   }
+  
+  // Player
+  updateMovement();
+  player.update();
+  if (attacking && attackAnimation.finished) {
+    attacking = false;
+    player.sprite = spriteBeforeAttack;
+  }
+  player.drawCharacter();
+  player.drawCollisionBox();
 }
 
 // Speed of movement
@@ -154,6 +191,22 @@ void addOneWayPlatform(float x, float y, float w, float h, float angle, color pl
 void addWall(float x, float y, float w, float h, float angle, color platformColor) {
   platforms.add(new Platform(x, y, w, h, angle, platformColor, false));
   // Not different from addPlatform, just for naming convention
+}
+
+boolean isPlayerAtDoor() {
+  float playerLeft = player.position.x - player.hitboxWidth/2;
+  float playerRight = player.position.x + player.hitboxWidth/2;
+  float playerBottom = player.position.y + player.hitboxHeight/2;
+  boolean overlapsDoor = playerRight > doorX && playerLeft < doorX + doorW && playerBottom > doorY && player.position.y - player.hitboxHeight/2 < doorY + doorH;
+  boolean standingOnGround = player.grounded;
+  return overlapsDoor && standingOnGround;
+}
+
+void enterDoor(String nextScreen, int x, int y) {
+  currentScreen = nextScreen;
+  platforms.clear();
+  player.position.set(x, y);
+  player.velocity.set(0, 0);
 }
 
 // On mouse press
@@ -188,7 +241,6 @@ void keyPressed() {
       }
     }
   }
-  //if (key == ENTER) currentScreen = "scene1";
   if (key == 'a' || key == 'A') {
     left = true;
     if (!attacking) {
@@ -204,23 +256,29 @@ void keyPressed() {
     }
   }
   if ((key == ' ' || key == 'w' || key == 'W') && player.grounded) player.velocity.y = -jumpPower;
-
   
-  // Dash on Shift
-  if (key == CODED && keyCode == SHIFT && !player.isDashing) {
-    player.isDashing = true;
-    player.dashTime = 0;
-    PVector dir = new PVector(0, 0);
-    if (left) dir.x -= 1;
-    if (right) dir.x += 1;
-    if (dir.mag() > 0) {
-      dir.normalize();
-      player.dashDirection = dir;
-    } 
-    else {
-      player.dashDirection = new PVector(0, -1);
+  // Interaction
+  if (key == ENTER || key == 'f' || key == 'F') {
+    if (playerAtDoor) {
+      enterDoor("scene2", 300, 300);
     }
   }
+  
+  // Dash on Shift
+  //if (key == CODED && keyCode == SHIFT && !player.isDashing) {
+  //  player.isDashing = true;
+  //  player.dashTime = 0;
+  //  PVector dir = new PVector(0, 0);
+  //  if (left) dir.x -= 1;
+  //  if (right) dir.x += 1;
+  //  if (dir.mag() > 0) {
+  //    dir.normalize();
+  //    player.dashDirection = dir;
+  //  } 
+  //  else {
+  //    player.dashDirection = new PVector(0, -1);
+  //  }
+  //}
 }
 
 // on key release
