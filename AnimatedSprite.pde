@@ -9,6 +9,7 @@ class AnimatedSprite {
   int frameTime;
   int lastFrameChange;
 
+  // Constructor
   AnimatedSprite(PImage[] frames, int frameTime) {
     this.frames = frames;
     this.frameTime = frameTime;

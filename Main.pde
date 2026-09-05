@@ -8,6 +8,9 @@
 Player player;
 AnimatedSprite idleAnimation;
 AnimatedSprite runAnimation;
+ArrayList<Platform> platforms = new ArrayList<Platform>();
+
+// Change Varibales
 String currentScreen = "title";
 int jumpPower = 16;
 
@@ -38,14 +41,18 @@ void setup() {
 
   // Setup Player Location
   PVector playerStart = new PVector(300, 300);
-  player = new Player(playerStart, new PVector(0, 0), 100, 128, 128, playerSarahIdle, 100);
+  player = new Player(playerStart, new PVector(0, 0), 100, 64, 120, playerSarahIdle, 100);
   player.sprite = idleAnimation;
 }
 
 void draw() {
   background(255);
 
-  // Testing sprite anim
+  // Testing sprite anim + platform
+  for (Platform platform : platforms) {
+    platform.drawPlatform();
+  }
+  
   updateMovement();
   player.update();
   player.drawCharacter();
@@ -95,6 +102,9 @@ void updateMovement() {
   player.accelerate(movement);
 }
 
+void addPlatform(float x, float y, float w, float h, color platformColor) {
+  platforms.add(new Platform(x, y, w, h, platformColor));
+}
 
 // On mouse press
 void mousePressed() {
@@ -106,7 +116,7 @@ void mousePressed() {
 void keyPressed() {
   // Moving
   if (key == CODED) {
-    if (keyCode == UP && player.position.y >= height - 64) player.velocity.y = -jumpPower;
+    if (keyCode == UP && player.grounded) player.velocity.y = -jumpPower;
     if (keyCode == LEFT) {
       left = true; 
       player.sprite = runAnimation; 
@@ -118,6 +128,7 @@ void keyPressed() {
       runAnimation.reset();
     }
   }
+  if (key == ENTER) currentScreen = "scene1";
   if (key == 'a' || key == 'A') {
     left = true;
     player.sprite = runAnimation; 
@@ -128,7 +139,8 @@ void keyPressed() {
     player.sprite = runAnimation; 
     runAnimation.reset();
   }
-  if ((key == ' ' || key == 'w' || key == 'W') && player.position.y >= height - 64) player.velocity.y = -jumpPower;
+  if ((key == ' ' || key == 'w' || key == 'W') && player.grounded) player.velocity.y = -jumpPower;
+
   
   // Dash on Shift
   if (key == CODED && keyCode == SHIFT && !player.isDashing) {
