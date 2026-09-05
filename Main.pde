@@ -6,6 +6,8 @@
 
 // Main Variables
 Player player;
+AnimatedSprite idleAnimation;
+AnimatedSprite runAnimation;
 String currentScreen = "title";
 int jumpPower = 16;
 
@@ -14,7 +16,8 @@ boolean left = false;
 boolean right = false;
 
 // Image Variables
-PImage playerSarahIdle, playerSarahRun;
+PImage[] playerSarahIdle = new PImage[4];
+PImage[] playerSarahRun = new PImage[6];
 
 // Setup
 void setup() {
@@ -23,16 +26,20 @@ void setup() {
   surface.setTitle("Untitle Racoon Game");
   surface.setResizable(false);
   frameRate(60);
-  noSmooth();
+  smooth();
   
-  // Setup Main Images
-  playerSarahIdle = loadImage("playerSarahIdle.png");
-  playerSarahRun = loadImage("playerSarahRun.png");
+  // Setup Player Idle
+  for (int i = 0; i < playerSarahIdle.length; i++) playerSarahIdle[i] = loadImage("sarah/playerSarahIdle_"+i+".png");
+  idleAnimation = new AnimatedSprite(playerSarahIdle, 300);
   
-  // Setup Player
+  // Setup Player Run
+  for (int i = 0; i < playerSarahRun.length; i++) playerSarahRun[i] = loadImage("sarah/playerSarahRun_"+i+".png");
+  runAnimation = new AnimatedSprite(playerSarahRun, 100);
+
+  // Setup Player Location
   PVector playerStart = new PVector(300, 300);
-  int playerFrameTime = 100;
-  player = new Player(playerStart, new PVector(0, 0), 100, 128, 128, playerSarahIdle, 64, 64, 4, 4, playerFrameTime);
+  player = new Player(playerStart, new PVector(0, 0), 100, 128, 128, playerSarahIdle, 100);
+  player.sprite = idleAnimation;
 }
 
 void draw() {
@@ -77,10 +84,17 @@ void draw() {
 // Speed of movement
 void updateMovement() {
   PVector movement = new PVector();
-  if (left) movement.x -= 1.5;
-  if (right) movement.x += 1.5;
+  if (left) {
+    movement.x -= 1.5;
+    player.facingLeft = true;
+  }
+  if (right) {
+    movement.x += 1.5;
+    player.facingLeft = false;
+  }
   player.accelerate(movement);
 }
+
 
 // On mouse press
 void mousePressed() {
@@ -93,11 +107,27 @@ void keyPressed() {
   // Moving
   if (key == CODED) {
     if (keyCode == UP && player.position.y >= height - 64) player.velocity.y = -jumpPower;
-    if (keyCode == LEFT) left = true;
-    if (keyCode == RIGHT) right = true;
+    if (keyCode == LEFT) {
+      left = true; 
+      player.sprite = runAnimation; 
+      runAnimation.reset();
+    }
+    if (keyCode == RIGHT) {
+      right = true; 
+      player.sprite = runAnimation; 
+      runAnimation.reset();
+    }
   }
-  if (key == 'a' || key == 'A') left = true;
-  if (key == 'd' || key == 'D') right = true;
+  if (key == 'a' || key == 'A') {
+    left = true;
+    player.sprite = runAnimation; 
+    runAnimation.reset();
+  }
+  if (key == 'd' || key == 'D') {
+    right = true; 
+    player.sprite = runAnimation; 
+    runAnimation.reset();
+  }
   if ((key == ' ' || key == 'w' || key == 'W') && player.position.y >= height - 64) player.velocity.y = -jumpPower;
   
   // Dash on Shift
@@ -121,9 +151,25 @@ void keyPressed() {
 void keyReleased() {
   // Slow Down
   if (key == CODED) {
-    if (keyCode == LEFT) left = false;
-    if (keyCode == RIGHT) right = false;
+    if (keyCode == LEFT) {
+      left = false; 
+      player.sprite = idleAnimation; 
+      idleAnimation.reset();
+    }
+    if (keyCode == RIGHT) {
+      right = false; 
+      player.sprite = idleAnimation; 
+      idleAnimation.reset();
+    }
   }
-  if (key == 'a' || key == 'A') left = false;
-  if (key == 'd' || key == 'D') right = false;
+  if (key == 'a' || key == 'A') {
+    left = false; 
+    player.sprite = idleAnimation; 
+    idleAnimation.reset();
+  }
+  if (key == 'd' || key == 'D') {
+    right = false; 
+    player.sprite = idleAnimation; 
+    idleAnimation.reset();
+  }
 }

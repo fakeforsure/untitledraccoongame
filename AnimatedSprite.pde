@@ -3,42 +3,42 @@
 // On: September 4, 2026
 
 class AnimatedSprite {
-  PImage sheet;
-  int frameWidth;
-  int frameHeight;
-  int frameCount;
-  int columns;
-  int currentFrame = 0;
-  int lastFrameChange;
-  int frameTime;
+  PImage[] frames;
 
-  // Constructor
-  AnimatedSprite( PImage sheet, int frameWidth, int frameHeight, int frameCount, int columns, int frameTime) {
-    this.sheet = sheet;
-    this.frameWidth = frameWidth;
-    this.frameHeight = frameHeight;
-    this.frameCount = frameCount;
-    this.columns = columns;
+  int currentFrame = 0;
+  int frameTime;
+  int lastFrameChange;
+
+  AnimatedSprite(PImage[] frames, int frameTime) {
+    this.frames = frames;
     this.frameTime = frameTime;
-    lastFrameChange = millis();
+    this.lastFrameChange = millis();
   }
 
   void update() {
     int currentTime = millis();
     if (currentTime - lastFrameChange >= frameTime) {
       currentFrame++;
-      if (currentFrame >= frameCount) currentFrame = 0;
+      if (currentFrame >= frames.length) currentFrame = 0;
       lastFrameChange += frameTime;
     }
   }
+  
+  void reset() {
+    currentFrame = 0;
+    lastFrameChange = millis();
+  }
 
-  void display(float x, float y) {
-    int column = currentFrame % columns;
-    int row = currentFrame / columns;
-    int sourceX = column * frameWidth;
-    int sourceY = row * frameHeight;
+  void display(float x, float y, boolean facingLeft) {
     imageMode(CENTER);
-    image(sheet, round(x), round(y), frameWidth*2, frameHeight*2, sourceX, sourceY, frameWidth, frameHeight);
+    if (facingLeft) {
+      pushMatrix();
+      translate(round(x), round(y));
+      scale(-1, 1);
+      image( frames[currentFrame], 0, 0, 128, 128);
+      popMatrix();
+    }
+    else image( frames[currentFrame], round(x), round(y), 128, 128);
     imageMode(CORNER);
   }
 }
