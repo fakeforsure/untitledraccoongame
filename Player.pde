@@ -10,14 +10,14 @@ class Player extends Character {
   // Calculate angle
   boolean touching(Platform p) {
     if (p.angle == 0) {
-      return position.x + hitboxWidth / 2 > p.x && position.x - hitboxWidth / 2 < p.x + p.w && position.y + hitboxHeight / 2 > p.y && position.y - hitboxHeight / 2 < p.y + p.h;
+      return position.x + hitboxWidth/2 > p.x && position.x - hitboxWidth/2 < p.x + p.w && position.y + hitboxHeight/2 > p.y && position.y - hitboxHeight/2 < p.y + p.h;
     }
     float relX = position.x - p.x;
     float relY = position.y - p.y;
     float unRotAngle = radians(-p.angle);
     float localX = relX * cos(unRotAngle) - relY * sin(unRotAngle);
     float localY = relX * sin(unRotAngle) + relY * cos(unRotAngle);
-    return localX + hitboxWidth / 2 > 0 && localX - hitboxWidth / 2 < p.w && localY + hitboxHeight / 2 > 0 && localY - hitboxHeight / 2 < p.h;
+    return localX + hitboxWidth/2 > 0 && localX - hitboxWidth/2 < p.w && localY + hitboxHeight/2 > 0 && localY - hitboxHeight/2 < p.h;
   }
 
   AnimatedSprite sprite; // Bring in the animation
@@ -39,10 +39,10 @@ class Player extends Character {
     for (Platform p : platforms) {
       if (!p.oneWay && p.angle == 0 && touching(p)) {
         if (velocity.x > 0) {
-          position.x = p.x - hitboxWidth / 2;
+          position.x = p.x - hitboxWidth/2;
         } 
         else if (velocity.x < 0) {
-          position.x = p.x + p.w + hitboxWidth / 2;
+          position.x = p.x + p.w + hitboxWidth/2;
         }
         velocity.x = 0;
       }
@@ -51,23 +51,21 @@ class Player extends Character {
     position.y += velocity.y;
     for (Platform p : platforms) {
       if (p.oneWay) {
-        boolean crossedTop =
-          previousY + hitboxHeight / 2 <= p.y &&
-          position.y + hitboxHeight / 2 >= p.y;
+        boolean crossedTop = previousY + hitboxHeight/2 <= p.y && position.y + hitboxHeight/2 >= p.y;
         if (velocity.y >= 0 && crossedTop) {
-          position.y = p.y - hitboxHeight / 2;
+          position.y = p.y - hitboxHeight/2;
           velocity.y = 0;
           grounded = true;
         }
       }
       else if (p.angle == 0 && touching(p)) {
         if (velocity.y > 0) {
-          position.y = p.y - hitboxHeight / 2;
+          position.y = p.y - hitboxHeight/2;
           velocity.y = 0;
           grounded = true;
         }
         else if (velocity.y < 0) {
-          position.y = p.y + p.h + hitboxHeight / 2;
+          position.y = p.y + p.h + hitboxHeight/2;
           velocity.y = 0;
         }
       }
@@ -75,17 +73,17 @@ class Player extends Character {
         float relativeX = position.x - p.x;
         float angleRad = radians(p.angle);
         float surfaceY = p.y + relativeX * sin(angleRad) * cos(angleRad);
-        position.y = surfaceY - hitboxHeight / 2;
+        position.y = surfaceY - hitboxHeight/2;
         velocity.y = 0;
         grounded = true;
       }
     }
-    if (position.x - hitboxWidth / 2 < 0) {
-      position.x = hitboxWidth / 2;
+    if (position.x - hitboxWidth/2 < 0) {
+      position.x = hitboxWidth/2;
       velocity.x = 0;
     }
-    if (position.x + hitboxWidth / 2 > width) {
-      position.x = width - hitboxWidth / 2;
+    if (position.x + hitboxWidth/2 > width) {
+      position.x = width - hitboxWidth/2;
       velocity.x = 0;
     }
   }
@@ -98,8 +96,7 @@ class Player extends Character {
     sprite.update();
   }
 
-
   void drawCharacter() {
-    sprite.display(position.x, position.y, facingLeft);
+    sprite.display(position.x, position.y, facingLeft, 192);
   }
 }

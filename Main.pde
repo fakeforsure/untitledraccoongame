@@ -7,11 +7,13 @@ boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
-AnimatedSprite idleAnimation;
-AnimatedSprite runAnimation;
+AnimatedSprite idleSarahAnimation;
+AnimatedSprite jumpSarahAnimation;
+AnimatedSprite runSarahAnimation;
 AnimatedSprite spriteBeforeAttack;
-AnimatedSprite attackAnimation;
+AnimatedSprite attackSarahAnimation;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
+AnimatedSprite fAnimation; // Not Sarah
 
 // Change Varibales
 String currentScreen = "scene1";
@@ -25,12 +27,15 @@ boolean right = false;
 
 // Player Image Variables
 PImage[] playerSarahIdle = new PImage[4];
+PImage[] playerSarahJump = new PImage[4];
 PImage[] playerSarahRun = new PImage[6];
 PImage[] playerSarahAttack = new PImage[6];
 
 // Other Image Varibles
 PImage bgScene1_Room;
-PImage key_f;
+PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
+
+PImage[] key_f = new PImage[2];
 
 // Scene Doors
 boolean playerAtDoor = false;
@@ -55,24 +60,31 @@ void setup() {
   // Setup Player
   // - Idle
   for (int i = 0; i < playerSarahIdle.length; i++) playerSarahIdle[i] = loadImage("sarah/playerSarahIdle_"+i+".png");
-  idleAnimation = new AnimatedSprite(playerSarahIdle, 300);
+  idleSarahAnimation = new AnimatedSprite(playerSarahIdle, 300);
+  // - Jump
+  for (int i = 0; i < playerSarahJump.length; i++) playerSarahJump[i] = loadImage("sarah/playerSarahJump_"+i+".png");
+  jumpSarahAnimation = new AnimatedSprite(playerSarahJump, 300);
   // - Run
   for (int i = 0; i < playerSarahRun.length; i++) playerSarahRun[i] = loadImage("sarah/playerSarahRun_"+i+".png");
-  runAnimation = new AnimatedSprite(playerSarahRun, 100);
+  runSarahAnimation = new AnimatedSprite(playerSarahRun, 100);
   // - Attack
   for (int i = 0; i < playerSarahAttack.length; i++) playerSarahAttack[i] = loadImage("sarah/playerSarahAttack_"+i+".png");
-  attackAnimation = new AnimatedSprite(playerSarahAttack, 50);
+  attackSarahAnimation = new AnimatedSprite(playerSarahAttack, 50);
 
   // Setup Player Location
   PVector playerStart = new PVector(1080, 560);
   player = new Player(playerStart, new PVector(0, 0), 100, 64, 186, playerSarahIdle, 100);
-  player.sprite = idleAnimation;
+  player.sprite = idleSarahAnimation;
   
   // Setup Scene Images
   bgScene1_Room = loadImage("bg/bgScene1_Room.png");
+  bgScene2_BusOut = loadImage("bg/bgScene2_BusOut.png");
+  bgScene2_BusIn = loadImage("bg/bgScene2_BusIn.png");
+  bgScene2_BusStop = loadImage("bg/bgScene2_BusStop.png");
   
-  // Setup Scene Images
-  key_f = loadImage("keyboard_f_outline.png");
+  // Keyboard Images
+  for (int i = 0; i < key_f.length; i++) key_f[i] = loadImage("keyboard_f_"+i+".png");
+  fAnimation = new AnimatedSprite(key_f, 300);
 }
 
 void draw() {
@@ -96,7 +108,7 @@ void draw() {
       addPlatform(154, 475, 100, 25, 30, #00FF00);
       addPlatform(240, 525, 100, 25, 30, #00FF00);
       addPlatform(340, 594, 100, 25, 30, #00FF00);
-      addPlatform(600, 427, 1000, 25, 0, #00FF00);
+      addPlatform(600, 427, 160, 25, 0, #00FF00);
       addOneWayPlatform(0, 427, 600, 25, 0, #00FF00);
       addWall(60, 0, 25, 720, 0, #00FF00);
       addWall(1187, 0, 25, 720, 0, #00FF00);
@@ -118,18 +130,19 @@ void draw() {
       }
       playerAtDoor = isPlayerAtDoor();
       if (playerAtDoor) {
-        image(key_f, doorX + doorW, doorY + (doorH/4));
+        fAnimation.display(doorX + doorW + 40, doorY + (doorH/2), false, 64);
+        fAnimation.update();
       }
       break; // XXX FOR NOW
     case "scene2":
-      background(255);
+      background(bgScene2_BusStop);
       // While transiting, racoon steals UPass
       // Gameplay: moving character WASD
       
       // Platform
       platforms.clear();
       // - Make Platform (addPlatform(x, y, w, h, color);
-      addPlatform(0, 656, 1280, 64, 0, #FFFF00);
+      addPlatform(0, 450, 1280, 64, 0, #FFFF00);
       // - Draw Platform (only when in debug mode)
       if (debugMode) {
         for (Platform platform : platforms) {
@@ -158,12 +171,12 @@ void draw() {
   // Player
   updateMovement();
   player.update();
-  if (attacking && attackAnimation.finished) {
+  if (attacking && attackSarahAnimation.finished) {
     attacking = false;
     player.sprite = spriteBeforeAttack;
   }
   player.drawCharacter();
-  player.drawCollisionBox();
+  if (debugMode) player.drawCollisionBox();
 }
 
 // Speed of movement
@@ -196,11 +209,14 @@ void addWall(float x, float y, float w, float h, float angle, color platformColo
 boolean isPlayerAtDoor() {
   float playerLeft = player.position.x - player.hitboxWidth/2;
   float playerRight = player.position.x + player.hitboxWidth/2;
+  float playerTop = player.position.y - player.hitboxHeight/2;
   float playerBottom = player.position.y + player.hitboxHeight/2;
-  boolean overlapsDoor = playerRight > doorX && playerLeft < doorX + doorW && playerBottom > doorY && player.position.y - player.hitboxHeight/2 < doorY + doorH;
+  boolean overlapsX = playerRight > doorX && playerLeft < doorX + doorW;
+  boolean overlapsY = playerBottom > doorY && playerTop < doorY + doorH;
   boolean standingOnGround = player.grounded;
-  return overlapsDoor && standingOnGround;
+  return overlapsX && overlapsY && standingOnGround;
 }
+
 
 void enterDoor(String nextScreen, int x, int y) {
   currentScreen = nextScreen;
@@ -216,8 +232,8 @@ void mousePressed() {
   if (!attacking) {
     attacking = true;
     spriteBeforeAttack = player.sprite;
-    player.sprite = attackAnimation;
-    attackAnimation.playOnce();
+    player.sprite = attackSarahAnimation;
+    attackSarahAnimation.playOnce();
   }
 }
 
@@ -225,77 +241,90 @@ void mousePressed() {
 void keyPressed() {
   // Moving
   if (key == CODED) {
-    if (keyCode == UP && player.grounded) player.velocity.y = -jumpPower;
+    if (keyCode == UP && player.grounded) {
+      player.velocity.y = -jumpPower;
+      if (!attacking) {
+        player.sprite = jumpSarahAnimation;
+        jumpSarahAnimation.reset();
+      }
+    }
     if (keyCode == LEFT) {
       left = true; 
       if (!attacking) {
-        player.sprite = runAnimation;
-        runAnimation.reset();
+        player.sprite = runSarahAnimation;
+        runSarahAnimation.reset();
       }
     }
     if (keyCode == RIGHT) {
       right = true; 
       if (!attacking) {
-        player.sprite = runAnimation;
-        runAnimation.reset();
+        player.sprite = runSarahAnimation;
+        runSarahAnimation.reset();
       }
     }
   }
   if (key == 'a' || key == 'A') {
     left = true;
     if (!attacking) {
-      player.sprite = runAnimation;
-      runAnimation.reset();
+      player.sprite = runSarahAnimation;
+      runSarahAnimation.reset();
     }
   }
   if (key == 'd' || key == 'D') {
     right = true; 
     if (!attacking) {
-      player.sprite = runAnimation;
-      runAnimation.reset();
+      player.sprite = runSarahAnimation;
+      runSarahAnimation.reset();
     }
   }
-  if ((key == ' ' || key == 'w' || key == 'W') && player.grounded) player.velocity.y = -jumpPower;
-  
+  if ((key == ' ' || key == 'w' || key == 'W') && player.grounded) {
+    player.velocity.y = -jumpPower;
+    if (!attacking) {
+      player.sprite = jumpSarahAnimation;
+      jumpSarahAnimation.reset();
+    }
+  }
+    
   // Interaction
   if (key == ENTER || key == 'f' || key == 'F') {
     if (playerAtDoor) {
-      enterDoor("scene2", 300, 300);
+      enterDoor("scene2", 100, 380);
+      playerAtDoor = false;
     }
   }
 }
 
-// on key release
+// On key release
 void keyReleased() {
   // Slow Down
   if (key == CODED) {
     if (keyCode == LEFT) {
       left = false; 
       if (!attacking) {
-        player.sprite = idleAnimation;
-        idleAnimation.reset();
+        player.sprite = idleSarahAnimation;
+        idleSarahAnimation.reset();
       }
     }
     if (keyCode == RIGHT) {
       right = false; 
       if (!attacking) {
-        player.sprite = idleAnimation;
-        idleAnimation.reset();
+        player.sprite = idleSarahAnimation;
+        idleSarahAnimation.reset();
       }
     }
   }
   if (key == 'a' || key == 'A') {
     left = false; 
     if (!attacking) {
-      player.sprite = idleAnimation;
-      idleAnimation.reset();
+      player.sprite = idleSarahAnimation;
+      idleSarahAnimation.reset();
     }
   }
   if (key == 'd' || key == 'D') {
     right = false; 
     if (!attacking) {
-      player.sprite = idleAnimation;
-      idleAnimation.reset();
+      player.sprite = idleSarahAnimation;
+      idleSarahAnimation.reset();
     }
   }
 }
