@@ -7,13 +7,14 @@
 // Main Variables
 Player player;
 String currentScreen = "title";
+int jumpPower = 16;
 
 // Key Variables
 boolean left = false;
 boolean right = false;
 
 // Image Variables
-PImage playerTest;
+PImage playerSarahIdle, playerSarahRun;
 
 // Setup
 void setup() {
@@ -22,16 +23,16 @@ void setup() {
   surface.setTitle("Untitle Racoon Game");
   surface.setResizable(false);
   frameRate(60);
-  smooth();
+  noSmooth();
   
   // Setup Main Images
-  playerTest = loadImage("playerTest.png");
-  if (playerTest != null) println("Image loaded: " + playerTest.width + " x " + playerTest.height);
+  playerSarahIdle = loadImage("playerSarahIdle.png");
+  playerSarahRun = loadImage("playerSarahRun.png");
   
   // Setup Player
   PVector playerStart = new PVector(300, 300);
-  int[] playerTiming = {1000, 1000, 1000, 1000};
-  player = new Player(playerStart, new PVector(0, 0), 100, 64, 64, playerTest, 64, 64, 4, 4, playerTiming);
+  int playerFrameTime = 100;
+  player = new Player(playerStart, new PVector(0, 0), 100, 128, 128, playerSarahIdle, 64, 64, 4, 4, playerFrameTime);
 }
 
 void draw() {
@@ -46,24 +47,30 @@ void draw() {
   switch (currentScreen) {
     case "title":
       // Title screen with play button, keep it simple, this is a single runthrough
+      break; // XXX FOR NOW
     case "scene1":
       // Home, MC wakes up, basic intro of student life
       // Gameplay: moving character WASD
+      break; // XXX FOR NOW
     case "scene2":
       // While transiting, racoon steals UPass
       // Gameplay: moving character WASD
+      break; // XXX FOR NOW
     case "scene3":
       // Student chases racoon into sewer
       // Gameplay: platformer, defeat racoon, get back UPass
     case "scene4":
       // Student finally arrives on campus, lost, ask student for direction
       // Gameplay: moving character WASD
+      break; // XXX FOR NOW
     case "scene5":
       // Student needs to get to class on time
       // Gameplay: platformer (copy pasted), to class
+      break; // XXX FOR NOW
     case "scene6":
       // Arrive at classroom in AQ, but the racoon is there
       // Gameplay: ^Mostly moving character WASD + story wrapup
+      break; // XXX FOR NOW
   }
 }
 
@@ -85,13 +92,13 @@ void mousePressed() {
 void keyPressed() {
   // Moving
   if (key == CODED) {
-    if (keyCode == UP && player.position.y >= height - 32) player.velocity.y = -15;
+    if (keyCode == UP && player.position.y >= height - 64) player.velocity.y = -jumpPower;
     if (keyCode == LEFT) left = true;
     if (keyCode == RIGHT) right = true;
   }
   if (key == 'a' || key == 'A') left = true;
   if (key == 'd' || key == 'D') right = true;
-  if ((key == ' ' || key == 'w' || key == 'W') && player.position.y >= height - 32) player.velocity.y = -15;
+  if ((key == ' ' || key == 'w' || key == 'W') && player.position.y >= height - 64) player.velocity.y = -jumpPower;
   
   // Dash on Shift
   if (key == CODED && keyCode == SHIFT && !player.isDashing) {

@@ -10,9 +10,9 @@ class Player extends Character {
 
   AnimatedSprite sprite;
 
-  Player(PVector position, PVector velocity, int health, float width, float height, PImage spriteSheet, int frameWidth, int frameHeight, int frameCount, int columns, int[] frameDurations) {
+  Player(PVector position, PVector velocity, int health, float width, float height, PImage spriteSheet, int frameWidth, int frameHeight, int frameCount, int columns, int frameTime) {
     super(position, velocity, health, width, height);
-    sprite = new AnimatedSprite(spriteSheet, frameWidth, frameHeight, frameCount, columns, frameDurations);
+    sprite = new AnimatedSprite(spriteSheet, frameWidth, frameHeight, frameCount, columns, frameTime);
   }
 
   void moveCharacter() {

@@ -10,25 +10,25 @@ class AnimatedSprite {
   int columns;
   int currentFrame = 0;
   int lastFrameChange;
-  int[] frameDurations;
+  int frameTime;
 
-  AnimatedSprite( PImage sheet, int frameWidth, int frameHeight, int frameCount, int columns, int[] frameDurations) {
+  // Constructor
+  AnimatedSprite( PImage sheet, int frameWidth, int frameHeight, int frameCount, int columns, int frameTime) {
     this.sheet = sheet;
     this.frameWidth = frameWidth;
     this.frameHeight = frameHeight;
     this.frameCount = frameCount;
     this.columns = columns;
-    this.frameDurations = frameDurations;
+    this.frameTime = frameTime;
     lastFrameChange = millis();
   }
 
   void update() {
-    if (millis() - lastFrameChange >= frameDurations[currentFrame]) {
+    int currentTime = millis();
+    if (currentTime - lastFrameChange >= frameTime) {
       currentFrame++;
-      lastFrameChange = millis();
-      if (currentFrame >= frameCount) {
-        currentFrame = 0;
-      }
+      if (currentFrame >= frameCount) currentFrame = 0;
+      lastFrameChange += frameTime;
     }
   }
 
@@ -38,7 +38,7 @@ class AnimatedSprite {
     int sourceX = column * frameWidth;
     int sourceY = row * frameHeight;
     imageMode(CENTER);
-    image(sheet, x, y, frameWidth, frameHeight, sourceX, sourceY, frameWidth, frameHeight);
+    image(sheet, round(x), round(y), frameWidth*2, frameHeight*2, sourceX, sourceY, frameWidth, frameHeight);
     imageMode(CORNER);
   }
 }

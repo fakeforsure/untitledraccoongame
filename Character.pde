@@ -33,7 +33,7 @@ class Character {
   void drawCharacter() { // Random box for test
     fill(150);
     rectMode(CENTER);
-    rect(position.x, position.y, 64, 64);
+    rect(position.x, position.y, 128, 128);
   }
 
   boolean hitCharacter(Character other) {
@@ -47,10 +47,10 @@ class Character {
   }
 
   void checkWalls() {
-    if (position.x < 32) position.x = 32;
-    if (position.x > width - 32) position.x = width - 32;
-    if (position.y > height - 32) {
-      position.y = height - 32;
+    if (position.x < 64) position.x = 64;
+    if (position.x > width - 64) position.x = width - 64;
+    if (position.y > height - 64) {
+      position.y = height - 64;
       velocity.y = 0;
     }
   }
