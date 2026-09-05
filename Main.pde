@@ -10,7 +10,7 @@ String currentScreen = "title";
 // Setup
 void setup() {
   // Setup Screen
-  size(1600, 900, P2D);
+  size(1280, 720, P2D);
   surface.setTitle("Untitle Racoon Game");
   surface.setResizable(false);
   frameRate(60);
