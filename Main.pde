@@ -2,67 +2,108 @@
 // By: Team Raccoon
 // On: September 4, 2026
 
-// Imports
+// Debug Mode
+boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
 AnimatedSprite idleAnimation;
 AnimatedSprite runAnimation;
+AnimatedSprite spriteBeforeAttack;
+AnimatedSprite attackAnimation;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
 
 // Change Varibales
-String currentScreen = "title";
+String currentScreen = "scene1";
 int jumpPower = 16;
+float runSpeed = 2.15;
+boolean attacking = false;
 
 // Key Variables
 boolean left = false;
 boolean right = false;
 
-// Image Variables
+// Player Image Variables
 PImage[] playerSarahIdle = new PImage[4];
 PImage[] playerSarahRun = new PImage[6];
+PImage[] playerSarahAttack = new PImage[6];
+
+// Other Image Varibles
+PImage bgScene1_Room;
 
 // Setup
 void setup() {
   // Setup Screen
-  size(1280, 720, P2D);
+  fullScreen(P2D);
+  surface.setSize(1280, 720);
+  surface.setLocation(displayWidth/2 - width/2, displayHeight/2 - height/2);
   surface.setTitle("Untitle Racoon Game");
   surface.setResizable(false);
   frameRate(60);
   smooth();
   
-  // Setup Player Idle
+  // Setup Player
+  // - Idle
   for (int i = 0; i < playerSarahIdle.length; i++) playerSarahIdle[i] = loadImage("sarah/playerSarahIdle_"+i+".png");
   idleAnimation = new AnimatedSprite(playerSarahIdle, 300);
-  
-  // Setup Player Run
+  // - Run
   for (int i = 0; i < playerSarahRun.length; i++) playerSarahRun[i] = loadImage("sarah/playerSarahRun_"+i+".png");
   runAnimation = new AnimatedSprite(playerSarahRun, 100);
+  // - Attack
+  for (int i = 0; i < playerSarahAttack.length; i++) playerSarahAttack[i] = loadImage("sarah/playerSarahAttack_"+i+".png");
+  attackAnimation = new AnimatedSprite(playerSarahAttack, 50);
 
   // Setup Player Location
-  PVector playerStart = new PVector(300, 300);
-  player = new Player(playerStart, new PVector(0, 0), 100, 64, 120, playerSarahIdle, 100);
+  PVector playerStart = new PVector(1080, 560);
+  player = new Player(playerStart, new PVector(0, 0), 100, 64, 186, playerSarahIdle, 100);
   player.sprite = idleAnimation;
+  
+  // Setup Scene Images
+  bgScene1_Room = loadImage("bg/bgScene1_Room.png");
 }
 
 void draw() {
-  background(255);
-
-  // Testing sprite anim + platform
-  for (Platform platform : platforms) {
-    platform.drawPlatform();
-  }
-  
-  updateMovement();
-  player.update();
-  player.drawCharacter();
-   
+  background(255); // Default
   // Main code starts here
   switch (currentScreen) {
     case "title":
       // Title screen with play button, keep it simple, this is a single runthrough
       break; // XXX FOR NOW
     case "scene1":
+      background(bgScene1_Room);
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 656, 1280, 64, 0, #00FF00);
+      //addPlatform(0, 333, 100, 25, 30, #00FF00); // Top angled platform, not needed
+      addPlatform(89, 410, 100, 25, 35, #00FF00);
+      addPlatform(154, 475, 100, 25, 30, #00FF00);
+      addPlatform(240, 525, 100, 25, 30, #00FF00);
+      addPlatform(340, 594, 100, 25, 30, #00FF00);
+      addPlatform(600, 427, 1000, 25, 0, #00FF00);
+      addOneWayPlatform(0, 427, 600, 25, 0, #00FF00);
+      addWall(60, 0, 25, 720, 0, #00FF00);
+      addWall(1187, 0, 25, 720, 0, #00FF00);
+      addWall(389, 0, 25, 279, 0, #00FF00);
+      addPlatform(65, 157, 1000, 25, 0, #00FF00);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
+      
+      // Player
+      updateMovement();
+      player.update();
+      if (attacking && attackAnimation.finished) {
+        attacking = false;
+        player.sprite = spriteBeforeAttack;
+      }
+      player.drawCharacter();
+      player.drawCollisionBox();
       // Home, MC wakes up, basic intro of student life
       // Gameplay: moving character WASD
       break; // XXX FOR NOW
@@ -92,24 +133,39 @@ void draw() {
 void updateMovement() {
   PVector movement = new PVector();
   if (left) {
-    movement.x -= 1.5;
+    movement.x -= runSpeed;
     player.facingLeft = true;
   }
   if (right) {
-    movement.x += 1.5;
+    movement.x += runSpeed;
     player.facingLeft = false;
   }
   player.accelerate(movement);
 }
 
-void addPlatform(float x, float y, float w, float h, color platformColor) {
-  platforms.add(new Platform(x, y, w, h, platformColor));
+void addPlatform(float x, float y, float w, float h, float angle, color platformColor) {
+  platforms.add(new Platform(x, y, w, h, angle, platformColor, false));
+}
+
+void addOneWayPlatform(float x, float y, float w, float h, float angle, color platformColor) {
+  platforms.add(new Platform(x, y, w, h, angle, platformColor, true));
+}
+
+void addWall(float x, float y, float w, float h, float angle, color platformColor) {
+  platforms.add(new Platform(x, y, w, h, angle, platformColor, false));
+  // Not different from addPlatform, just for naming convention
 }
 
 // On mouse press
 void mousePressed() {
   // Debugging
-  println("Mouse pressed: " + mouseX + ", " + mouseY);
+  if (debugMode) println("Mouse pressed: " + mouseX + ", " + mouseY);
+  if (!attacking) {
+    attacking = true;
+    spriteBeforeAttack = player.sprite;
+    player.sprite = attackAnimation;
+    attackAnimation.playOnce();
+  }
 }
 
 // On key press
@@ -119,25 +175,33 @@ void keyPressed() {
     if (keyCode == UP && player.grounded) player.velocity.y = -jumpPower;
     if (keyCode == LEFT) {
       left = true; 
-      player.sprite = runAnimation; 
-      runAnimation.reset();
+      if (!attacking) {
+        player.sprite = runAnimation;
+        runAnimation.reset();
+      }
     }
     if (keyCode == RIGHT) {
       right = true; 
-      player.sprite = runAnimation; 
+      if (!attacking) {
+        player.sprite = runAnimation;
+        runAnimation.reset();
+      }
+    }
+  }
+  //if (key == ENTER) currentScreen = "scene1";
+  if (key == 'a' || key == 'A') {
+    left = true;
+    if (!attacking) {
+      player.sprite = runAnimation;
       runAnimation.reset();
     }
   }
-  if (key == ENTER) currentScreen = "scene1";
-  if (key == 'a' || key == 'A') {
-    left = true;
-    player.sprite = runAnimation; 
-    runAnimation.reset();
-  }
   if (key == 'd' || key == 'D') {
     right = true; 
-    player.sprite = runAnimation; 
-    runAnimation.reset();
+    if (!attacking) {
+      player.sprite = runAnimation;
+      runAnimation.reset();
+    }
   }
   if ((key == ' ' || key == 'w' || key == 'W') && player.grounded) player.velocity.y = -jumpPower;
 
@@ -165,23 +229,31 @@ void keyReleased() {
   if (key == CODED) {
     if (keyCode == LEFT) {
       left = false; 
-      player.sprite = idleAnimation; 
-      idleAnimation.reset();
+      if (!attacking) {
+        player.sprite = idleAnimation;
+        idleAnimation.reset();
+      }
     }
     if (keyCode == RIGHT) {
       right = false; 
-      player.sprite = idleAnimation; 
-      idleAnimation.reset();
+      if (!attacking) {
+        player.sprite = idleAnimation;
+        idleAnimation.reset();
+      }
     }
   }
   if (key == 'a' || key == 'A') {
     left = false; 
-    player.sprite = idleAnimation; 
-    idleAnimation.reset();
+    if (!attacking) {
+      player.sprite = idleAnimation;
+      idleAnimation.reset();
+    }
   }
   if (key == 'd' || key == 'D') {
     right = false; 
-    player.sprite = idleAnimation; 
-    idleAnimation.reset();
+    if (!attacking) {
+      player.sprite = idleAnimation;
+      idleAnimation.reset();
+    }
   }
 }

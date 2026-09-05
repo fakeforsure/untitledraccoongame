@@ -35,6 +35,17 @@ class Character {
     rectMode(CENTER);
     rect(position.x, position.y, 128, 128);
   }
+  
+  void drawCollisionBox() {
+    pushMatrix();
+    translate(position.x, position.y);
+    noFill();
+    rectMode(CENTER);
+    stroke(255, 0, 0);
+    rect(0, 0, hitboxWidth, hitboxHeight);
+    noStroke();
+    popMatrix();
+  }
 
   boolean hitCharacter(Character other) {
     // Axis-Aligned bounding box collision
