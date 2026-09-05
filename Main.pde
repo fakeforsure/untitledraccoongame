@@ -1,5 +1,5 @@
-// Untitled Racoon Game
-// By: Team Racoon
+// Untitled Raccoon Game
+// By: Team Raccoon
 // On: September 4, 2026
 
 // Imports

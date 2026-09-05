@@ -1,5 +1,5 @@
-// Untitled Racoon Game - Player (extends Character)
-// By: Team Racoon
+// Untitled Raccoon Game - Player (extends Character)
+// By: Team Raccoon
 // On: September 4, 2026
 
 class Player extends Character {

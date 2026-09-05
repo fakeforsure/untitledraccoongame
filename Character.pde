@@ -1,5 +1,5 @@
-// Untitled Racoon Game - Character
-// By: Team Racoon
+// Untitled Raccoon Game - Character
+// By: Team Raccoon
 // On: September 4, 2026
 
 // Variables

@@ -1,5 +1,5 @@
-// Untitled Racoon Game - AnimatedSprite
-// By: Team Racoon
+// Untitled Raccoon Game - AnimatedSprite
+// By: Team Raccoon
 // On: September 4, 2026
 
 class AnimatedSprite {
