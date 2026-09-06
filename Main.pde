@@ -129,7 +129,7 @@ void setup() {
   // Setup Screen
   size(1280, 720, P2D);
   surface.setLocation(displayWidth/2 - width/2, displayHeight/2 - height/2);
-  surface.setTitle("Untitle Racoon Game");
+  surface.setTitle("Untitled Racoon Game");
   surface.setResizable(false);
   frameRate(60);
   smooth();
