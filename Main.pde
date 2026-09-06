@@ -3,15 +3,16 @@
 // On: September 4, 2026
 
 // Debug Mode
-boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
+boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
+
 AnimatedSprite idleSarahAnimation;
 AnimatedSprite jumpSarahAnimation;
 AnimatedSprite runSarahAnimation;
-AnimatedSprite spriteBeforeAttack;
 AnimatedSprite attackSarahAnimation;
+AnimatedSprite spriteBeforeAttacking; // For Sarah only
 ArrayList<Platform> platforms = new ArrayList<Platform>();
 AnimatedSprite fAnimation; // Not Sarah
 
@@ -20,6 +21,7 @@ String currentScreen = "scene1";
 int jumpPower = 16;
 float runSpeed = 2.15;
 boolean attacking = false;
+boolean jumping = false;
 
 // Key Variables
 boolean left = false;
@@ -63,7 +65,7 @@ void setup() {
   idleSarahAnimation = new AnimatedSprite(playerSarahIdle, 300);
   // - Jump
   for (int i = 0; i < playerSarahJump.length; i++) playerSarahJump[i] = loadImage("sarah/playerSarahJump_"+i+".png");
-  jumpSarahAnimation = new AnimatedSprite(playerSarahJump, 300);
+  jumpSarahAnimation = new AnimatedSprite(playerSarahJump, 150);
   // - Run
   for (int i = 0; i < playerSarahRun.length; i++) playerSarahRun[i] = loadImage("sarah/playerSarahRun_"+i+".png");
   runSarahAnimation = new AnimatedSprite(playerSarahRun, 100);
@@ -170,13 +172,29 @@ void draw() {
   
   // Player
   updateMovement();
+  boolean wasGrounded = player.grounded; // Don't move, must be before player update
   player.update();
   if (attacking && attackSarahAnimation.finished) {
     attacking = false;
-    player.sprite = spriteBeforeAttack;
+    player.sprite = spriteBeforeAttacking;
+  }
+  if (!wasGrounded && player.grounded) {
+    jumping = false;
+    if (!attacking) {
+      if (left || right) {
+        player.sprite = runSarahAnimation;
+        runSarahAnimation.reset();
+      } else {
+        player.sprite = idleSarahAnimation;
+        idleSarahAnimation.reset();
+      }
+    }
   }
   player.drawCharacter();
-  if (debugMode) player.drawCollisionBox();
+  
+  if (debugMode) {
+    player.drawCollisionBox();
+  }
 }
 
 // Speed of movement
@@ -191,6 +209,17 @@ void updateMovement() {
     player.facingLeft = false;
   }
   player.accelerate(movement);
+}
+
+void startJump() {
+  if (!player.grounded) {
+    return;
+  }
+  player.velocity.y = -jumpPower;
+  jumping = true;
+  player.sprite = jumpSarahAnimation;
+  jumpSarahAnimation.reset();
+  jumpSarahAnimation.playOnce();
 }
 
 void addPlatform(float x, float y, float w, float h, float angle, color platformColor) {
@@ -229,10 +258,12 @@ void enterDoor(String nextScreen, int x, int y) {
 void mousePressed() {
   // Debugging
   if (debugMode) println("Mouse pressed: " + mouseX + ", " + mouseY);
+  
   if (!attacking) {
     attacking = true;
-    spriteBeforeAttack = player.sprite;
+    spriteBeforeAttacking = player.sprite;
     player.sprite = attackSarahAnimation;
+    attackSarahAnimation.reset();
     attackSarahAnimation.playOnce();
   }
 }
@@ -241,23 +272,17 @@ void mousePressed() {
 void keyPressed() {
   // Moving
   if (key == CODED) {
-    if (keyCode == UP && player.grounded) {
-      player.velocity.y = -jumpPower;
-      if (!attacking) {
-        player.sprite = jumpSarahAnimation;
-        jumpSarahAnimation.reset();
-      }
-    }
+    if (keyCode == UP) startJump();
     if (keyCode == LEFT) {
       left = true; 
-      if (!attacking) {
+      if (!attacking && !jumping) {
         player.sprite = runSarahAnimation;
         runSarahAnimation.reset();
       }
     }
     if (keyCode == RIGHT) {
       right = true; 
-      if (!attacking) {
+      if (!attacking && !jumping) {
         player.sprite = runSarahAnimation;
         runSarahAnimation.reset();
       }
@@ -265,25 +290,19 @@ void keyPressed() {
   }
   if (key == 'a' || key == 'A') {
     left = true;
-    if (!attacking) {
+    if (!attacking && !jumping) {
       player.sprite = runSarahAnimation;
       runSarahAnimation.reset();
     }
   }
   if (key == 'd' || key == 'D') {
     right = true; 
-    if (!attacking) {
+    if (!attacking && !jumping) {
       player.sprite = runSarahAnimation;
       runSarahAnimation.reset();
     }
   }
-  if ((key == ' ' || key == 'w' || key == 'W') && player.grounded) {
-    player.velocity.y = -jumpPower;
-    if (!attacking) {
-      player.sprite = jumpSarahAnimation;
-      jumpSarahAnimation.reset();
-    }
-  }
+  if (key == ' ' || key == 'w' || key == 'W') startJump();
     
   // Interaction
   if (key == ENTER || key == 'f' || key == 'F') {
@@ -300,14 +319,14 @@ void keyReleased() {
   if (key == CODED) {
     if (keyCode == LEFT) {
       left = false; 
-      if (!attacking) {
+      if (!attacking && !jumping) {
         player.sprite = idleSarahAnimation;
         idleSarahAnimation.reset();
       }
     }
     if (keyCode == RIGHT) {
       right = false; 
-      if (!attacking) {
+      if (!attacking && !jumping) {
         player.sprite = idleSarahAnimation;
         idleSarahAnimation.reset();
       }
@@ -315,14 +334,14 @@ void keyReleased() {
   }
   if (key == 'a' || key == 'A') {
     left = false; 
-    if (!attacking) {
+    if (!attacking && !jumping) {
       player.sprite = idleSarahAnimation;
       idleSarahAnimation.reset();
     }
   }
   if (key == 'd' || key == 'D') {
     right = false; 
-    if (!attacking) {
+    if (!attacking && !jumping) {
       player.sprite = idleSarahAnimation;
       idleSarahAnimation.reset();
     }
