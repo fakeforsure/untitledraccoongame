@@ -84,7 +84,7 @@ PImage[] talkSarahFrames = new PImage[talkSarahTotalFrames];
 int talkSarahCurrentFrame = 0;
 PImage talkSarah, talkSarahMad;
 // - Others
-PImage talkRichard;
+PImage talkRichard, talkRichardMad;
 PImage kingFatHead, kingFatBellay, kingFatArms; // Just his head talks, thankfully...
 
 // Other Image Varibles
@@ -175,7 +175,8 @@ void setup() {
   portraits.put("talkSarah", talkSarah);
   portraits.put("talkSarahMad", talkSarahMad);
   // - Richard
-  talkRichard = loadImage("richard/talkRichard_Placeholder.png"); // To change?
+  talkRichard = loadImage("richard/talkRichard.png");
+  talkRichardMad = loadImage("richard/talkRichard_Map.png");
   // - King Fat
   kingFatHead = loadImage("kingfat/King_fatty_fat_arms.png");
   kingFatBellay = loadImage("kingfat/King_fatty_fat_bellay.png");
