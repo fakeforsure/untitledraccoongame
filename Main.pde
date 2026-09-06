@@ -159,6 +159,14 @@ void setup() {
   bgScene2_BusOut = loadImage("bg/bgScene2_BusOut.png");
   bgScene2_BusIn = loadImage("bg/bgScene2_BusIn.png");
   bgScene2_BusStop = loadImage("bg/bgScene2_BusStop.png");
+  bgScene3_City = loadImage("bg/bgScene3_City.png");
+  bgScene3_Concourse = loadImage("bg/bgScene3_Concourse.png");
+  bgScene3_Skytrain = loadImage("bg/bgScene3_Skytrain.png");
+  bgScene3_Throneroom = loadImage("bg/bgScene3_Throneroom.png");
+  bgScene4_BusLoop = loadImage("bg/bgScene4_BusLoop.png");
+  bgScene5_AQEntrance = loadImage("bg/bgScene5_AQEntrance.png");
+  bgScene5_UnderHackathon = loadImage("bg/bgScene5_UnderHackathon.png");
+  bgScene5_WMC = loadImage("bg/bgScene5_WMC.png");
   
   // Keyboard Images
   // - F
