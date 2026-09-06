@@ -91,10 +91,10 @@ PImage kingFatHead, kingFatBellay, kingFatArms; // Just his head talks, thankful
 PImage tree, upass;
 PImage bgScene1_Room;
 PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
-PImage bgScene3_City, bgScene3_Concourse, bgScene3_Skytrain, bgScene3_Throneroom;
+PImage bgScene3_City, bgScene3_Skytrain, bgScene3_Throneroom;
 PImage bgScene3_SewerEntrance, bgScene3_SewerCave;
 PImage bgScene4_BusLoop;
-PImage bgScene5_AQEntrance, bgScene5_UnderHackathon, bgScene5_WMC;
+PImage bgScene5_AQEntrance, bgScene5_UnderHackathon, bgScene5_WMC, bgScene5_Concourse;
 PImage bgScene6_LectureHall;
 PImage[] projectileBomb = new PImage[2];
 PImage[] key_f = new PImage[2];
@@ -197,13 +197,13 @@ void setup() {
   bgScene2_BusIn = loadImage("bg/bgScene2_BusIn.png");
   bgScene2_BusStop = loadImage("bg/bgScene2_BusStop.png");
   bgScene3_City = loadImage("bg/bgScene3_City.png");
-  bgScene3_Concourse = loadImage("bg/bgScene3_Concourse.png");
   bgScene3_Skytrain = loadImage("bg/bgScene3_Skytrain.png");
   bgScene3_Throneroom = loadImage("bg/bgScene3_Throneroom.png");
   bgScene3_SewerEntrance = loadImage("bg/bgScene3_sewerenterence.png");
   bgScene3_SewerCave = loadImage("bg/bgScene3_City.png");
   bgScene4_BusLoop = loadImage("bg/bgScene4_BusLoop.png");
   bgScene5_AQEntrance = loadImage("bg/bgScene5_AQEntrance.png");
+  bgScene5_Concourse = loadImage("bg/bgScene5_Concourse.png");
   bgScene5_UnderHackathon = loadImage("bg/bgScene5_UnderHackathon.png");
   bgScene5_WMC = loadImage("bg/bgScene5_WMC.png");
   bgScene6_LectureHall = loadImage("bg/bgScene6_lecturehall.png");
