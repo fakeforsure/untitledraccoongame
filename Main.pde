@@ -12,7 +12,7 @@ import java.util.HashMap;
 import processing.sound.*;
 
 // Debug Mode
-boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
+boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
@@ -84,6 +84,7 @@ PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
 PImage bgScene3_City, bgScene3_Concourse, bgScene3_Skytrain, bgScene3_Throneroom;
 PImage bgScene4_BusLoop;
 PImage bgScene5_AQEntrance, bgScene5_UnderHackathon, bgScene5_WMC;
+PImage bgScene6_LectureHall;
 PImage[] projectileBomb = new PImage[2];
 PImage[] key_f = new PImage[2];
 PImage[] key_down = new PImage[2];
@@ -182,6 +183,7 @@ void setup() {
   bgScene5_AQEntrance = loadImage("bg/bgScene5_AQEntrance.png");
   bgScene5_UnderHackathon = loadImage("bg/bgScene5_UnderHackathon.png");
   bgScene5_WMC = loadImage("bg/bgScene5_WMC.png");
+  bgScene6_LectureHall = loadImage("bg/bgScene6_lecturehall.png");
   
   // Setup Projectiles Images
   for (int i = 0; i < projectileBomb.length; i++) projectileBomb[i] = loadImage("projectiles/bomb_"+i+".png");
@@ -375,7 +377,7 @@ void draw() {
       playerMove();
       break;
     case "scene6":
-      background(bgScene5_WMC);
+      background(bgScene6_LectureHall);
       // Arrive at classroom in AQ, but the racoon is there
       // Gameplay: Mostly moving character WASD + story wrapup
       
