@@ -516,6 +516,7 @@ void draw() {
       playerMove();
       break;
     case "scene4":
+    dialogueActive = true;
       musMercury.stop();
       background(bgScene4_BusLoop);
       // Student finally arrives on campus, lost, ask student for direction
@@ -537,6 +538,7 @@ void draw() {
       playerMove();
       break;
     case "scene5":
+    dialogueActive = true;
       background(bgScene5_AQEntrance);
       // Student needs to get to class on time
       // Gameplay: platformer (copy pasted), to class
@@ -557,6 +559,7 @@ void draw() {
       playerMove();
       break;
     case "scene6":
+    dialogueActive = true;
       background(bgScene6_LectureHall);
       // Arrive at classroom in AQ, but the racoon is there
       // Gameplay: Mostly moving character WASD + story wrapup
@@ -729,6 +732,8 @@ void keyPressed() {
         } else { // End of scene
           dialogueActive = false; 
           if (debugMode) println("End of dialogue for " + currentScreen);
+          if (currentScreen == "scene4") currentScreen = "scene5";
+          if (currentScreen == "scene5") currentScreen = "scene6";
           return;
         }
       } else { // End of CSV
