@@ -17,7 +17,8 @@ final boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
-BasicEnemy richard;
+BasicEnemy richardIdle;
+BasicEnemy richardRun;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 HashMap<String, PImage> portraits = new HashMap<String, PImage>();
@@ -192,7 +193,8 @@ void setup() {
   player = new Player(playerStart, new PVector(0, 0), 100, 64, 186, playerSarahIdle, 100);
   player.sprite = idleSarahAnimation;
   // - Richard
-  richard = new BasicEnemy(new PVector(400, 350), new PVector(0, 0), 10, 100, 100);
+  richardIdle = new BasicEnemy(new PVector(400, 350), new PVector(0, 0), 10, 100, 100, idleRichardAnimation);
+  richardRun = new BasicEnemy(new PVector(400, 350), new PVector(0, 0), 10, 100, 100, runRichardAnimation);
   
   // Setup Scene Images
   tree = loadImage("bg/evil_tree_of_pure_evil_mueheheh.png");
@@ -425,9 +427,9 @@ void draw() {
               platform.drawCollisionBox();
             }
           }
-          richard.isHealthBar = false;
-          richard.update(player);
-          richard.drawCharacter();
+          richardIdle.isHealthBar = false;
+          richardIdle.update(player);
+          richardIdle.drawCharacter();
           
           if (raccoonMess == 0 && !dialogueActive) {
             raccoonMess = 1;
@@ -438,7 +440,7 @@ void draw() {
           break;
         case 1:
           image(bgScene3_City, 0, 0);
-          richard.health = 0;
+          richardIdle.health = 0;
     
           // Platforms
           platforms.clear();
@@ -501,10 +503,10 @@ void draw() {
           image(kingFatHead, 925, 289);
     
           // Richard Fight
-          richard.isHealthBar = true;
-          richard.update(player);
-          richard.drawCharacter();
-          checkBagHitEnemy(richard, player);
+          richardRun.isHealthBar = true;
+          richardRun.update(player);
+          richardRun.drawCharacter();
+          checkBagHitEnemy(richardRun, player);
           break;
       }
     

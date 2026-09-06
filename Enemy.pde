@@ -25,10 +25,10 @@ class BasicEnemy extends Character {
   AnimatedSprite sprite;
 
   // Constructor
-  BasicEnemy(PVector position, PVector velocity, int health, float width, float height) {
+  BasicEnemy(PVector position, PVector velocity, int health, float width, float height, AnimatedSprite startingAnimation) {
     super(position, velocity, health, width, height);
     this.maxHealth = health;
-    sprite = new AnimatedSprite(playerRichardRun, 100);
+    this.sprite = startingAnimation;
   }
   
   void update(Player player) {
@@ -89,6 +89,7 @@ class BasicEnemy extends Character {
       health -= dmg;
       if (health <= 0) {
         isDead = true;
+        sfxExplosion.play();
         deathTimer = 0;
       }
     }
