@@ -3,18 +3,21 @@
 // On: September 4, 2026
 
 // Debug Mode
-boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
+boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
 
+// - Animation
 AnimatedSprite idleSarahAnimation;
 AnimatedSprite jumpSarahAnimation;
 AnimatedSprite runSarahAnimation;
 AnimatedSprite attackSarahAnimation;
 AnimatedSprite spriteBeforeAttacking; // For Sarah only
 ArrayList<Platform> platforms = new ArrayList<Platform>();
-AnimatedSprite fAnimation; // Not Sarah
+AnimatedSprite fAnimation; // F key
+AnimatedSprite downAnimation; // Arrow Down key
+AnimatedSprite talkSarahAnimation;
 
 // Change Varibales
 String currentScreen = "scene1";
@@ -22,6 +25,13 @@ int jumpPower = 16;
 float runSpeed = 2.15;
 boolean attacking = false;
 boolean jumping = false;
+
+// Dialogue Variables
+int currentDialogue = 1;
+int lastDialogue = 0;
+int dialogueStartTime = 0;
+int charsPerSecond = 35;
+
 
 // Key Variables
 boolean left = false;
@@ -33,11 +43,21 @@ PImage[] playerSarahJump = new PImage[4];
 PImage[] playerSarahRun = new PImage[6];
 PImage[] playerSarahAttack = new PImage[6];
 
+// Talk Image Variables
+int talkSarahTotalFrames = 2;
+PImage[] talkSarahFrames = new PImage[talkSarahTotalFrames];
+int talkSarahCurrentFrame = 0;
+PImage talkSarah, talkSarahMad;
+
 // Other Image Varibles
 PImage bgScene1_Room;
 PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
-
 PImage[] key_f = new PImage[2];
+PImage[] key_down = new PImage[2];
+
+// Text Variables
+PFont font;
+int currentText = 0;
 
 // Scene Doors
 boolean playerAtDoor = false;
@@ -59,6 +79,9 @@ void setup() {
   frameRate(60);
   smooth();
   
+  // Setup Font
+  font = createFont("Determination.ttf", 128);
+  
   // Setup Player
   // - Idle
   for (int i = 0; i < playerSarahIdle.length; i++) playerSarahIdle[i] = loadImage("sarah/playerSarahIdle_"+i+".png");
@@ -73,6 +96,14 @@ void setup() {
   for (int i = 0; i < playerSarahAttack.length; i++) playerSarahAttack[i] = loadImage("sarah/playerSarahAttack_"+i+".png");
   attackSarahAnimation = new AnimatedSprite(playerSarahAttack, 50);
 
+  // Setup Talk Images
+  // - Sarah
+  for (int i = 0; i < talkSarahTotalFrames; i++) {
+    talkSarahFrames[i] = loadImage("sarah/talkSarah_" + i + ".png");
+  }
+  talkSarah = talkSarahFrames[0];
+  talkSarahMad = loadImage("sarah/talkSarah_Mad.png");
+
   // Setup Player Location
   PVector playerStart = new PVector(1080, 560);
   player = new Player(playerStart, new PVector(0, 0), 100, 64, 186, playerSarahIdle, 100);
@@ -85,8 +116,12 @@ void setup() {
   bgScene2_BusStop = loadImage("bg/bgScene2_BusStop.png");
   
   // Keyboard Images
+  // - F
   for (int i = 0; i < key_f.length; i++) key_f[i] = loadImage("keyboard_f_"+i+".png");
   fAnimation = new AnimatedSprite(key_f, 300);
+  // - Arrow Down
+  for (int i = 0; i < key_down.length; i++) key_down[i] = loadImage("keyboard_arrow_down_"+i+".png");
+  downAnimation = new AnimatedSprite(key_down, 300);
 }
 
 void draw() {
@@ -138,7 +173,7 @@ void draw() {
       break; // XXX FOR NOW
     case "scene2":
       background(bgScene2_BusStop);
-      // While transiting, racoon steals UPass
+      // At bus stop, racoon steals UPass, so player takes the bus, fade to black
       // Gameplay: moving character WASD
       
       // Platform
@@ -154,7 +189,7 @@ void draw() {
       }
       break; // XXX FOR NOW
     case "scene3":
-      // Student chases racoon into sewer
+      // Black fades out, arrive at Skytrain station by bus, student chases racoon into sewer
       // Gameplay: platformer, defeat racoon, get back UPass
     case "scene4":
       // Student finally arrives on campus, lost, ask student for direction
@@ -195,6 +230,15 @@ void draw() {
   if (debugMode) {
     player.drawCollisionBox();
   }
+  
+  // Constant Sarah Gif
+  if (frameCount % 12 == 0) {
+    talkSarahCurrentFrame = (talkSarahCurrentFrame + 1) % talkSarahTotalFrames;
+  }
+  talkSarah = talkSarahFrames[talkSarahCurrentFrame];
+  
+  // DIALOGUE IS HERE, NOTHING ELSE SHOULD BE UNDERNEATH!!!
+  dialogue(); // End!
 }
 
 // Speed of movement
@@ -246,7 +290,6 @@ boolean isPlayerAtDoor() {
   return overlapsX && overlapsY && standingOnGround;
 }
 
-
 void enterDoor(String nextScreen, int x, int y) {
   currentScreen = nextScreen;
   platforms.clear();
@@ -273,6 +316,7 @@ void keyPressed() {
   // Moving
   if (key == CODED) {
     if (keyCode == UP) startJump();
+    if (keyCode == DOWN) currentDialogue += 1;
     if (keyCode == LEFT) {
       left = true; 
       if (!attacking && !jumping) {

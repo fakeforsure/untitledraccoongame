@@ -31,9 +31,11 @@ class Character {
   }
 
   void drawCharacter() { // Random box for test
+    pushMatrix();
     fill(150);
     rectMode(CENTER);
     rect(position.x, position.y, 128, 128);
+    popMatrix();
   }
   
   void drawCollisionBox() {

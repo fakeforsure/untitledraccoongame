@@ -1,4 +1,4 @@
-// Untitled Raccoon Game
+// Untitled Raccoon Game - Platform
 // By: Team Raccoon
 // On: September 5, 2026
 

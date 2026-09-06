@@ -44,6 +44,7 @@ class AnimatedSprite {
 
   void display(float x, float y, boolean facingLeft, int size) {
     // Default size should be 192
+    pushMatrix();
     imageMode(CENTER);
     if (facingLeft) {
       pushMatrix();
@@ -52,7 +53,12 @@ class AnimatedSprite {
       image(frames[currentFrame], 0, 0, size, size);
       popMatrix();
     }
-    else image(frames[currentFrame], round(x), round(y), size, size);
+    else {
+      pushMatrix();
+      image(frames[currentFrame], round(x), round(y), size, size);
+      popMatrix();
+    }
     imageMode(CORNER);
+    popMatrix();
   }
 }
