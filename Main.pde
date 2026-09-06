@@ -4,7 +4,8 @@
 
 // Hello judges. Please note, we are not like the other youngsters oh no no no. 
 // As you may have noticed... We coded everything by hand. No pre-built game engine!
-// Anyways, in this game, you play as a brand-new SFU student who hates her life.
+// We hope you are swayed by our narrative, one of the themes of this game jam!
+// Anymeow, in this game, you play as a brand-new SFU student who hates her life.
 // Oh but watch out for the raccoons, they tend to love to steal your UPass~!!
 
 // Imports
@@ -57,6 +58,7 @@ boolean attacking = false;
 boolean jumping = false;
 boolean running = false;
 int sfxStepTime = 0;
+int bossMusic = 0;
 
 // Dialogue Variables
 int currentDialogue = 0;
@@ -120,6 +122,7 @@ float busSpeed = 8;
 int busState = 0;
 float busSceneOpacity = 255;
 float busFadeSpeed = 5;
+int raccoonMess = 0; 
 
 // Setup
 void setup() {
@@ -176,11 +179,11 @@ void setup() {
   portraits.put("talkSarahMad", talkSarahMad);
   // - Richard
   talkRichard = loadImage("richard/talkRichard.png");
-  talkRichardMad = loadImage("richard/talkRichard_Map.png");
+  talkRichardMad = loadImage("richard/talkRichard_Mad.png");
   // - King Fat
-  kingFatHead = loadImage("kingfat/King_fatty_fat_arms.png");
+  kingFatHead = loadImage("kingfat/King_fatty_fat_head.png");
   kingFatBellay = loadImage("kingfat/King_fatty_fat_bellay.png");
-  kingFatArms = loadImage("kingfat/King_fatty_fat_head.png");
+  kingFatArms = loadImage("kingfat/King_fatty_fat_arms.png");
 
   // Setup Player Location
   // - Sarah
@@ -229,6 +232,7 @@ void setup() {
   // Setup Sound
   sfxJump = new SoundFile(this, "sfx/Sarah/Sarah Jump.wav");
   musMercury = new SoundFile(this, "sfx/Music/Mercury.mp3");
+  musMercury.amp(0.5);
   sfxClick = new SoundFile(this, "sfx/General/Click.mp3");
   sfxExplosion = new SoundFile(this, "sfx/General/Explosion.mp3");
   sfxInteract = new SoundFile(this, "sfx/General/interact.wav");
@@ -366,6 +370,8 @@ void draw() {
       } else if (busState == 3) {
         tint(255, busSceneOpacity); 
         image(bgScene3_Skytrain, 0, 0);
+        currentScreen = "scene3";
+        dialogueActive = false;
       }
       if (busState == 0) {
         if (busX < busTargetX) {
@@ -407,28 +413,110 @@ void draw() {
       background(bgScene3_Skytrain);
       // Black fades out, arrive at Skytrain station by bus, student chases racoon into sewer
       // Gameplay: platformer, defeat racoon, get back UPass
-      
-      image(bgScene3_City,0,0);
-      image(bgScene3_SewerEntrance,0,0);
-      image(bgScene3_SewerCave,0,0);
-      image(bgScene3_Throneroom,0,0);
-      // Platform
-      platforms.clear();
-      
-      // - Make Platform (addPlatform(x, y, w, h, color);
-      addPlatform(0, 450, 1280, 64, 0, #F7A707);
-      // - Draw Platform (only when in debug mode)
-      if (debugMode) {
+      switch (raccoonMess) {
+        case 0:
+          dialogueActive = true;
+          
+          // Platform
+          platforms.clear();
+          
+          // - Make Platform (addPlatform(x, y, w, h, color);
+          addPlatform(0, 450, 1280, 64, 0, #F7A707);
+          // - Draw Platform (only when in debug mode)
+          if (debugMode) {
+            for (Platform platform : platforms) {
+              platform.drawPlatform();
+              platform.drawCollisionBox();
+            }
+          }
+        case 1:
+          image(bgScene3_City,0,0);
+          
+          // Platform
+          platforms.clear();
+          
+          // - Make Platform (addPlatform(x, y, w, h, color);
+          addPlatform(0, 450, 1280, 64, 0, color(150));
+          addPlatform(80, 370, 180, 24, 0, color(150));
+          addPlatform(340, 300, 180, 24, 0, color(150));
+          addPlatform(620, 370, 180, 24, 0, color(150));
+          addPlatform(880, 290, 180, 24, 0, color(150));
+          addPlatform(1110, 370, 120, 24, 0, color(150)); // Last
+          // - Draw Platform (only when in debug mode)
+          if (debugMode) {
+            for (Platform platform : platforms) {
+              platform.drawPlatform();
+              platform.drawCollisionBox();
+            }
+          }
+          break;
+        case 2:
+          image(bgScene3_SewerEntrance, 0, 0);
+          
+          // Platform
+          platforms.clear();
+          
+          // - Make Platform (addPlatform(x, y, w, h, color);
+          addPlatform(0, 450, 1280, 64, 0, color(150));
+          addPlatform(60, 360, 140, 24, 0, color(150)); // First
+          addPlatform(250, 270, 140, 24, 0, color(150));
+          addPlatform(440, 350, 140, 24, 0, color(150));
+          addPlatform(630, 240, 140, 24, 0, color(150));
+          addPlatform(820, 330, 140, 24, 0, color(150));
+          addPlatform(1010, 220, 140, 24, 0, color(150));
+          addPlatform(1170, 350, 80, 24, 0, color(150)); // Last
+          break;
+        case 3:
+          image(bgScene3_SewerCave, 0, 0);
+          
+          // Platform
+          platforms.clear();
+          
+          // - Make Platform (addPlatform(x, y, w, h, color);
+          // Ground
+          addPlatform(0, 450, 1280, 64, 0, color(150));
+          addPlatform(100, 350, 220, 24, -8, color(150)); // First
+          addPlatform(390, 280, 180, 24, 8, color(150));
+          addPlatform(640, 350, 220, 24, -8, color(150));
+          addPlatform(930, 270, 180, 24, 8, color(150));
+          addPlatform(1150, 350, 100, 24, -8, color(150)); // Last
+          break;
+        case 4:
+          image(bgScene3_Throneroom, 0, 0);
+          
+          // Platform
+          platforms.clear();
+          
+          // - Make Platform (addPlatform(x, y, w, h, color);
+          // Ground
+          addPlatform(0, 600, 1280, 64, 0, color(150));
+          
+          // Boss Fight
+          if (bossMusic == 0) {
+            musMercury.play();
+            bossMusic++;
+          }
+          image(kingFatArms, 905, 309);
+          image(kingFatBellay, 929, 316);
+          image(kingFatArms, 969, 331);
+          image(kingFatHead, 925, 289);
+          break;
+        case 5:
+          raccoonMess = 4;
+          break;
+      }
+      if ((raccoonMess != 4) || (debugMode)) {
         for (Platform platform : platforms) {
           platform.drawPlatform();
           platform.drawCollisionBox();
         }
       }
-      
+       
       // Player (always at bottom)
       playerMove();
       break;
     case "scene4":
+      musMercury.stop();
       background(bgScene4_BusLoop);
       // Student finally arrives on campus, lost, ask student for direction
       // Gameplay: moving character WASD
@@ -452,12 +540,6 @@ void draw() {
       background(bgScene5_AQEntrance);
       // Student needs to get to class on time
       // Gameplay: platformer (copy pasted), to class
-      image(bgScene5_UnderHackathon,0,0);
-      image(bgScene3_Concourse,0,0);
-      image(bgScene5_WMC ,0,0);
-      image(bgScene5_AQEntrance,0,0);
-
-      
       
       // Platform
       platforms.clear();
@@ -672,6 +754,7 @@ void keyPressed() {
       }
     }
   }
+  if (key == 'n') raccoonMess++;
   if (key == 'a' || key == 'A') {
     left = true;
     if (!attacking && !jumping) {
