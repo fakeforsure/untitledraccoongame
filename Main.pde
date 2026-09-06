@@ -2,6 +2,11 @@
 // By: Team Raccoon
 // On: September 4, 2026
 
+// Hello judges. Please note, we are not like the other youngsters oh no no no. 
+// As you may have noticed... We coded everything by hand. No pre-built game engine!
+// Anyways, in this game, you play as a brand-new SFU student who hates her life.
+// Oh but watch out for the raccoons, they tend to love to steal your UPass~!!
+
 // Imports
 import java.util.HashMap;
 
