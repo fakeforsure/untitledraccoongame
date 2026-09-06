@@ -15,19 +15,24 @@ boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
+Player richard;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
 HashMap<String, PImage> portraits = new HashMap<String, PImage>();
 Table table;
 
 // - Animation
+AnimatedSprite fAnimation; // F key
+AnimatedSprite downAnimation; // Arrow Down key
+// -- Sarah
 AnimatedSprite idleSarahAnimation;
 AnimatedSprite jumpSarahAnimation;
 AnimatedSprite runSarahAnimation;
 AnimatedSprite attackSarahAnimation;
 AnimatedSprite spriteBeforeAttacking; // For Sarah only
-AnimatedSprite fAnimation; // F key
-AnimatedSprite downAnimation; // Arrow Down key
 AnimatedSprite talkSarahAnimation;
+// -- Richard
+AnimatedSprite idleRichardAnimation;
+AnimatedSprite runRichardAnimation;
 
 // Change Varibales
 String currentScreen = "scene1";
@@ -52,6 +57,9 @@ PImage[] playerSarahIdle = new PImage[4];
 PImage[] playerSarahJump = new PImage[4];
 PImage[] playerSarahRun = new PImage[6];
 PImage[] playerSarahAttack = new PImage[6];
+PImage[] playerRichardIdle = new PImage[2];
+PImage[] playerRichardRun = new PImage[4];
+PImage kingFatHead, kingFatBellay, kingFatArms;
 
 // Talk Image Variables
 int talkSarahTotalFrames = 2;
@@ -62,6 +70,10 @@ PImage talkSarah, talkSarahMad;
 // Other Image Varibles
 PImage bgScene1_Room;
 PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
+PImage bgScene3_City, bgScene3_Concourse, bgScene3_Skytrain, bgScene3_Throneroom;
+PImage bgScene4_BusLoop;
+PImage bgScene5_AQEntrance, bgScene5_UnderHackathon, bgScene5_WMC;
+PImage[] projectileBomb = new PImage[2];
 PImage[] key_f = new PImage[2];
 PImage[] key_down = new PImage[2];
 
@@ -102,19 +114,27 @@ void setup() {
   }
   
   // Setup Player
-  // - Idle
+  // - Sarah
+  // -- Idle
   for (int i = 0; i < playerSarahIdle.length; i++) playerSarahIdle[i] = loadImage("sarah/playerSarahIdle_"+i+".png");
   idleSarahAnimation = new AnimatedSprite(playerSarahIdle, 300);
-  // - Jump
+  // -- Jump
   for (int i = 0; i < playerSarahJump.length; i++) playerSarahJump[i] = loadImage("sarah/playerSarahJump_"+i+".png");
   jumpSarahAnimation = new AnimatedSprite(playerSarahJump, 150);
-  // - Run
+  // -- Run
   for (int i = 0; i < playerSarahRun.length; i++) playerSarahRun[i] = loadImage("sarah/playerSarahRun_"+i+".png");
   runSarahAnimation = new AnimatedSprite(playerSarahRun, 100);
-  // - Attack
+  // -- Attack
   for (int i = 0; i < playerSarahAttack.length; i++) playerSarahAttack[i] = loadImage("sarah/playerSarahAttack_"+i+".png");
   attackSarahAnimation = new AnimatedSprite(playerSarahAttack, 50);
-
+  // - Richard
+  // -- Idle
+  for (int i = 0; i < playerRichardIdle.length; i++) playerRichardIdle[i] = loadImage("richard/playerRichardIdle_"+i+".png");
+  idleRichardAnimation = new AnimatedSprite(playerRichardIdle, 300);
+  // -- Run
+  for (int i = 0; i < playerRichardRun.length; i++) playerRichardRun[i] = loadImage("richard/playerRichardRun_"+i+".png");
+  runRichardAnimation = new AnimatedSprite(playerRichardRun, 100);
+  
   // Setup Talk Images
   // - Sarah
   for (int i = 0; i < talkSarahTotalFrames; i++) {
@@ -124,6 +144,10 @@ void setup() {
   talkSarahMad = loadImage("sarah/talkSarah_Mad.png");
   portraits.put("talkSarah", talkSarah);
   portraits.put("talkSarahMad", talkSarahMad);
+  // - King Fat
+  kingFatHead = loadImage("kingfat/King_fatty_fat_arms.png");
+  kingFatBellay = loadImage("kingfat/King_fatty_fat_bellay.png");
+  kingFatArms = loadImage("kingfat/King_fatty_fat_head.png");
 
   // Setup Player Location
   PVector playerStart = new PVector(1080, 560);
