@@ -182,10 +182,14 @@ void setup() {
   // - Richard
   talkRichard = loadImage("richard/talkRichard.png");
   talkRichardMad = loadImage("richard/talkRichard_Mad.png");
+  portraits.put("talkRichard", talkRichard);
+  portraits.put("talkRichardMad", talkRichardMad);
   // - King Fat
   kingFatHead = loadImage("kingfat/King_fatty_fat_head.png");
   kingFatBellay = loadImage("kingfat/King_fatty_fat_bellay.png");
   kingFatArms = loadImage("kingfat/King_fatty_fat_arms.png");
+  portraits.put("talkRichard", talkRichard);
+  portraits.put("upass", upass);
 
   // Setup Player Location
   // - Sarah
@@ -200,7 +204,7 @@ void setup() {
   tree = loadImage("bg/evil_tree_of_pure_evil_mueheheh.png");
   upass = loadImage("projectiles/upass.png"); // Projectile cuz it gets thrown to the player at the end
   bgScene1_Room = loadImage("bg/bgScene1_Room.png");
-  bgScene2_BusOut = loadImage("bg/bgScene2_BusOut.png");
+  bgScene2_BusOut = loadImage("bg/BUSEXTERIOR.png");
   bgScene2_BusIn = loadImage("bg/bgScene2_BusIn.png");
   bgScene2_BusStop = loadImage("bg/bgScene2_BusStop.png");
   bgScene3_City = loadImage("bg/bgScene3_City.png");
@@ -301,7 +305,7 @@ void draw() {
       // Player (always at bottom)
       playerMove();
       break;
-    case "scene1":
+    case "scene0":
       background(bgScene1_Room);
       // Home, MC wakes up, basic intro of student life
       // Gameplay: moving character WASD
@@ -344,7 +348,7 @@ void draw() {
       // Player (always at bottom)
       playerMove();
       break;
-    case "scene2":
+    case "scene1":
       background(0);
       if (busState != 2) image(bgScene2_BusStop, 0, 0);
       //else image(bgScene3_Skytrain, 0, 0);
@@ -373,7 +377,7 @@ void draw() {
       } else if (busState == 3) {
         tint(255, busSceneOpacity); 
         image(bgScene3_Skytrain, 0, 0);
-        currentScreen = "scene3";
+        currentScreen = "scene2";
         dialogueActive = false;
       }
       if (busState == 0) {
@@ -412,7 +416,7 @@ void draw() {
       tint(255, 255); 
       playerMove();
       break;
-    case "scene3":
+    case "scene2":
       background(bgScene3_Skytrain);
       // Black fades out, arrive at Skytrain station by bus, student chases raccoon into sewer
       // Gameplay: platformer, defeat raccoon, get back UPass
@@ -431,6 +435,12 @@ void draw() {
           richardIdle.update(player);
           richardIdle.drawCharacter();
           
+          pushMatrix();
+          textSize(80);
+          fill(255);
+          text("Objective: Talk to ??? (Press Down Arrow)", width/4, height/4, 500, 500);
+          popMatrix();
+          
           if (raccoonMess == 0 && !dialogueActive) {
             raccoonMess = 1;
           
@@ -439,54 +449,8 @@ void draw() {
           }
           break;
         case 1:
-          image(bgScene3_City, 0, 0);
-          richardIdle.health = 0;
-    
-          // Platforms
-          platforms.clear();
-    
-          addPlatform(0, 450, 1280, 64, 0, color(150));
-          addPlatform(80, 370, 180, 24, 0, color(150));
-          addPlatform(340, 300, 180, 24, 0, color(150));
-          addPlatform(620, 370, 180, 24, 0, color(150));
-          addPlatform(880, 290, 180, 24, 0, color(150));
-          addPlatform(1110, 370, 120, 24, 0, color(150)); // Last platform
-    
-          break;
-        case 2:
-          image(bgScene3_SewerEntrance, 0, 0);
-          
-          // Platform
-          platforms.clear();
-    
-          addPlatform(0, 450, 1280, 64, 0, color(150));
-          addPlatform(60, 360, 140, 24, 0, color(150));
-          addPlatform(250, 270, 140, 24, 0, color(150));
-          addPlatform(440, 350, 140, 24, 0, color(150));
-          addPlatform(630, 240, 140, 24, 0, color(150));
-          addPlatform(820, 330, 140, 24, 0, color(150));
-          addPlatform(1010, 220, 140, 24, 0, color(150));
-          addPlatform(1170, 350, 80, 24, 0, color(150)); // Last platform
-    
-          break;
-        case 3:
-          image(bgScene3_SewerCave, 0, 0);
-    
-          // Platform
-          platforms.clear();
-    
-          addPlatform(0, 450, 1280, 64, 0, color(150));
-    
-          addPlatform(100, 350, 220, 24, -8, color(150));
-          addPlatform(390, 280, 180, 24, 8, color(150));
-          addPlatform(640, 350, 220, 24, -8, color(150));
-          addPlatform(930, 270, 180, 24, 8, color(150));
-          addPlatform(1150, 350, 100, 24, -8, color(150)); // Last platform
-    
-          break;
-        case 4:
           image(bgScene3_Throneroom, 0, 0);
-    
+
           // Platform
           platforms.clear();
     
@@ -507,6 +471,11 @@ void draw() {
           richardRun.update(player);
           richardRun.drawCharacter();
           checkBagHitEnemy(richardRun, player);
+          
+          if (richardRun.health == 0) raccoonMess = 2;
+          break;
+        case 2:
+          currentScreen = "scene4";
           break;
       }
     
@@ -520,12 +489,34 @@ void draw() {
       }
       
       playerMove();
-      checkRaccoonLastPlatform();
+      //checkRaccoonLastPlatform();
+      break;
+    case "scene3":
+      image(bgScene3_Throneroom, 0, 0);
+
+      // Platform
+      platforms.clear();
+
+      addPlatform(0, 600, 1280, 64, 0, color(150));
+
+
+      image(kingFatArms, 905, 309);
+      image(kingFatBellay, 929, 316);
+      image(kingFatArms, 969, 331);
+      image(kingFatHead, 925, 289);
+
+      // Richard Fight
+      richardRun.isHealthBar = true;
+      richardRun.update(player);
+      richardRun.drawCharacter();
+      checkBagHitEnemy(richardRun, player);
       break;
     case "scene4":
-    dialogueActive = true;
-      musMercury.stop();
+      dialogueActive = true;
       background(bgScene4_BusLoop);
+      textSize(80);
+      fill(255);
+      text("CONGRATS! YOU MADE IT TO SFU AND GOT YOUR UPASS BACK!!!", width/4, height/4, 500, 500);
       // Student finally arrives on campus, lost, ask student for direction
       // Gameplay: moving character WASD
       
@@ -725,7 +716,7 @@ void mousePressed() {
   
   // Title Screen
   if (currentScreen == "title") {
-    currentScreen = "scene1";
+    currentScreen = "scene0";
     dialogueActive = true;
     return;
   }
@@ -758,6 +749,8 @@ void keyPressed() {
         } else { // End of scene
           dialogueActive = false; 
           if (debugMode) println("End of dialogue for " + currentScreen);
+          
+          if ((currentScreen == "scene2") && (raccoonMess == 0)) raccoonMess++;
           if (currentScreen == "scene4") currentScreen = "scene5";
           if (currentScreen == "scene5") currentScreen = "scene6";
           return;
@@ -785,7 +778,6 @@ void keyPressed() {
       }
     }
   }
-  if (key == 'n') raccoonMess++;
   if (key == 'a' || key == 'A') {
     left = true;
     if (!attacking && !jumping) {
@@ -807,8 +799,14 @@ void keyPressed() {
   // Interaction
   if (key == ENTER || key == 'f' || key == 'F') {
     if (playerAtDoor) {
-      enterDoor("scene2", 100, 380);
-      playerAtDoor = false;
+      if (currentScreen == "scene0") {
+        enterDoor("scene1", 100, 380);
+        playerAtDoor = false;
+      }
+      if (currentScreen == "scene2") {
+        enterDoor("scene3", 1110, 300);
+        playerAtDoor = false;
+      }
     }
     if (busState == 1) {
       busState = 2;
