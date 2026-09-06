@@ -59,6 +59,7 @@ boolean jumping = false;
 boolean running = false;
 int sfxStepTime = 0;
 int bossMusic = 0;
+boolean changingRaccoonSection = false;
 
 // Dialogue Variables
 int currentDialogue = 0;
@@ -411,109 +412,113 @@ void draw() {
       break;
     case "scene3":
       background(bgScene3_Skytrain);
-      // Black fades out, arrive at Skytrain station by bus, student chases racoon into sewer
-      // Gameplay: platformer, defeat racoon, get back UPass
+      // Black fades out, arrive at Skytrain station by bus, student chases raccoon into sewer
+      // Gameplay: platformer, defeat raccoon, get back UPass
       switch (raccoonMess) {
         case 0:
           dialogueActive = true;
-          
-          // Platform
           platforms.clear();
-          
-          // - Make Platform (addPlatform(x, y, w, h, color);
           addPlatform(0, 450, 1280, 64, 0, #F7A707);
-          // - Draw Platform (only when in debug mode)
           if (debugMode) {
             for (Platform platform : platforms) {
               platform.drawPlatform();
               platform.drawCollisionBox();
             }
           }
+          richard.isHealthBar = false;
+          richard.update(player);
+          richard.drawCharacter();
+          
+          if (raccoonMess == 0 && !dialogueActive) {
+            raccoonMess = 1;
+          
+            player.position.set(60, 350);
+            player.velocity.set(0, 0);
+          }
+          break;
         case 1:
-          image(bgScene3_City,0,0);
-          
-          // Platform
+          image(bgScene3_City, 0, 0);
+          richard.health = 0;
+    
+          // Platforms
           platforms.clear();
-          
-          // - Make Platform (addPlatform(x, y, w, h, color);
+    
           addPlatform(0, 450, 1280, 64, 0, color(150));
           addPlatform(80, 370, 180, 24, 0, color(150));
           addPlatform(340, 300, 180, 24, 0, color(150));
           addPlatform(620, 370, 180, 24, 0, color(150));
           addPlatform(880, 290, 180, 24, 0, color(150));
-          addPlatform(1110, 370, 120, 24, 0, color(150)); // Last
-          // - Draw Platform (only when in debug mode)
-          if (debugMode) {
-            for (Platform platform : platforms) {
-              platform.drawPlatform();
-              platform.drawCollisionBox();
-            }
-          }
+          addPlatform(1110, 370, 120, 24, 0, color(150)); // Last platform
+    
           break;
         case 2:
           image(bgScene3_SewerEntrance, 0, 0);
           
           // Platform
           platforms.clear();
-          
-          // - Make Platform (addPlatform(x, y, w, h, color);
+    
           addPlatform(0, 450, 1280, 64, 0, color(150));
-          addPlatform(60, 360, 140, 24, 0, color(150)); // First
+          addPlatform(60, 360, 140, 24, 0, color(150));
           addPlatform(250, 270, 140, 24, 0, color(150));
           addPlatform(440, 350, 140, 24, 0, color(150));
           addPlatform(630, 240, 140, 24, 0, color(150));
           addPlatform(820, 330, 140, 24, 0, color(150));
           addPlatform(1010, 220, 140, 24, 0, color(150));
-          addPlatform(1170, 350, 80, 24, 0, color(150)); // Last
+          addPlatform(1170, 350, 80, 24, 0, color(150)); // Last platform
+    
           break;
         case 3:
           image(bgScene3_SewerCave, 0, 0);
-          
+    
           // Platform
           platforms.clear();
-          
-          // - Make Platform (addPlatform(x, y, w, h, color);
-          // Ground
+    
           addPlatform(0, 450, 1280, 64, 0, color(150));
-          addPlatform(100, 350, 220, 24, -8, color(150)); // First
+    
+          addPlatform(100, 350, 220, 24, -8, color(150));
           addPlatform(390, 280, 180, 24, 8, color(150));
           addPlatform(640, 350, 220, 24, -8, color(150));
           addPlatform(930, 270, 180, 24, 8, color(150));
-          addPlatform(1150, 350, 100, 24, -8, color(150)); // Last
+          addPlatform(1150, 350, 100, 24, -8, color(150)); // Last platform
+    
           break;
         case 4:
           image(bgScene3_Throneroom, 0, 0);
-          
+    
           // Platform
           platforms.clear();
-          
-          // - Make Platform (addPlatform(x, y, w, h, color);
-          // Ground
+    
           addPlatform(0, 600, 1280, 64, 0, color(150));
-          
-          // Boss Fight
+    
           if (bossMusic == 0) {
             musMercury.play();
             bossMusic++;
           }
+    
           image(kingFatArms, 905, 309);
           image(kingFatBellay, 929, 316);
           image(kingFatArms, 969, 331);
           image(kingFatHead, 925, 289);
-          break;
-        case 5:
-          raccoonMess = 4;
+    
+          // Richard Fight
+          richard.isHealthBar = true;
+          richard.update(player);
+          richard.drawCharacter();
+          checkBagHitEnemy(richard, player);
           break;
       }
-      if ((raccoonMess != 4) || (debugMode)) {
+    
+      if ((raccoonMess != 4) || debugMode) {
         for (Platform platform : platforms) {
           platform.drawPlatform();
-          platform.drawCollisionBox();
+          if (debugMode) {
+            platform.drawCollisionBox();
+          }
         }
       }
-       
-      // Player (always at bottom)
+      
       playerMove();
+      checkRaccoonLastPlatform();
       break;
     case "scene4":
       musMercury.stop();
@@ -660,6 +665,25 @@ void addOneWayPlatform(float x, float y, float w, float h, float angle, color pl
 void addWall(float x, float y, float w, float h, float angle, color platformColor) {
   platforms.add(new Platform(x, y, w, h, angle, platformColor, false));
   // Not different from addPlatform, just for naming convention
+}
+
+void checkRaccoonLastPlatform() {
+  if (raccoonMess < 1 || raccoonMess > 3) {
+    return;
+  }
+
+  if (platforms.size() == 0) {
+    return;
+  }
+  
+  Platform lastPlatform = platforms.get(platforms.size() - 1);
+  if (!changingRaccoonSection && player.grounded && player.touching(lastPlatform)) {
+    changingRaccoonSection = true;
+    raccoonMess++;
+    player.position.set(60, 350);
+    player.velocity.set(0, 0);
+    changingRaccoonSection = false;
+  }
 }
 
 boolean isPlayerAtDoor() {
