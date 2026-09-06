@@ -12,12 +12,13 @@ import java.util.HashMap;
 import processing.sound.*;
 
 // Debug Mode
-boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
+boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
 Player richard;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
+ArrayList<Particle> particles = new ArrayList<Particle>();
 HashMap<String, PImage> portraits = new HashMap<String, PImage>();
 Table table;
 SoundFile sfxJump, sfxStep, sfxLaugh, sfxType;
@@ -39,11 +40,13 @@ AnimatedSprite downAnimation; // Arrow Down key
 AnimatedSprite projectileBombAnimation; // Da bomb
 
 // Change Varibales
-String currentScreen = "scene1";
+String currentScreen = "title";
 int jumpPower = 16;
 float runSpeed = 2.15;
 boolean attacking = false;
 boolean jumping = false;
+boolean running = false;
+int sfxStepTime = 0;
 
 // Dialogue Variables
 int currentDialogue = 0;
@@ -204,8 +207,50 @@ void draw() {
   // Main code starts here
   switch (currentScreen) {
     case "title":
+      background(bgScene5_UnderHackathon);
       // Title screen with play button, keep it simple, this is a single runthrough
-      break; // XXX FOR NOW
+
+      // Title
+      pushMatrix();
+      fill(255);
+      // Particles
+      if (frameCount % 3 == 0) {
+        particles.add(new Particle(random(width), height));
+      }
+      for (int i = particles.size() - 1; i >= 0; i--) {
+        Particle p = particles.get(i);
+        p.update();
+        p.display();
+        if (p.isDead()) {
+          particles.remove(i);
+        }
+      }
+      
+      // Text
+      fill(255);
+      textFont(font);
+      textSize(72);
+      text("Untitled Raccoon Game", 60, 510);
+      fill(200);
+      textSize(32);
+      text("click anywhere to start", 60, 550);
+      popMatrix();
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 565, 1280, 64, 0, #8D00FF);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
     case "scene1":
       background(bgScene1_Room);
       // Home, MC wakes up, basic intro of student life
@@ -245,7 +290,10 @@ void draw() {
         fAnimation.display(doorX + doorW + 40, doorY + (doorH/2), false, 64);
         fAnimation.update();
       }
-      break; // XXX FOR NOW
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
     case "scene2":
       background(bgScene2_BusStop);
       // At bus stop, racoon steals UPass, so player takes the bus, fade to black
@@ -262,7 +310,10 @@ void draw() {
           platform.drawCollisionBox();
         }
       }
-      break; // XXX FOR NOW
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
     case "scene3":
       background(bgScene3_Skytrain);
       // Black fades out, arrive at Skytrain station by bus, student chases racoon into sewer
@@ -279,6 +330,10 @@ void draw() {
           platform.drawCollisionBox();
         }
       }
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
     case "scene4":
       background(bgScene4_BusLoop);
       // Student finally arrives on campus, lost, ask student for direction
@@ -295,9 +350,12 @@ void draw() {
           platform.drawCollisionBox();
         }
       }
-      break; // XXX FOR NOW
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
     case "scene5":
-      background(bgScene5_UnderHackathon);
+      background(bgScene5_AQEntrance);
       // Student needs to get to class on time
       // Gameplay: platformer (copy pasted), to class
       
@@ -312,7 +370,10 @@ void draw() {
           platform.drawCollisionBox();
         }
       }
-      break; // XXX FOR NOW
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
     case "scene6":
       background(bgScene5_WMC);
       // Arrive at classroom in AQ, but the racoon is there
@@ -329,10 +390,23 @@ void draw() {
           platform.drawCollisionBox();
         }
       }
-      break; // XXX FOR NOW
+      
+      // Player (always at bottom)
+      playerMove();
+      break;
   }
   
-  // Player
+  // Constant Sarah Gif
+  if (frameCount % 12 == 0) {
+    talkSarahCurrentFrame = (talkSarahCurrentFrame + 1) % talkSarahTotalFrames;
+  }
+  talkSarah = talkSarahFrames[talkSarahCurrentFrame];
+  
+  // DIALOGUE IS HERE, NOTHING ELSE SHOULD BE UNDERNEATH!!!
+  dialogue(); // End!
+}
+
+void playerMove() {
   updateMovement();
   boolean wasGrounded = player.grounded; // Don't move, must be before player update
   player.update();
@@ -357,15 +431,6 @@ void draw() {
   if (debugMode) {
     player.drawCollisionBox();
   }
-  
-  // Constant Sarah Gif
-  if (frameCount % 12 == 0) {
-    talkSarahCurrentFrame = (talkSarahCurrentFrame + 1) % talkSarahTotalFrames;
-  }
-  talkSarah = talkSarahFrames[talkSarahCurrentFrame];
-  
-  // DIALOGUE IS HERE, NOTHING ELSE SHOULD BE UNDERNEATH!!!
-  dialogue(); // End!
 }
 
 // Speed of movement
@@ -380,6 +445,14 @@ void updateMovement() {
     player.facingLeft = false;
   }
   player.accelerate(movement);
+  
+  if (running) {
+    int interval = int(random(400, 1000));
+    if (millis() - sfxStepTime >= interval) {
+      sfxStep.play();
+      sfxStepTime = millis();
+    }
+  }
 }
 
 void startJump() {
@@ -439,25 +512,21 @@ void mousePressed() {
   // Debugging
   if (debugMode) println("Mouse pressed: " + mouseX + ", " + mouseY);
   
+  // Title Screen
+  if (currentScreen == "title") {
+    currentScreen = "scene1";
+    dialogueActive = true;
+    return;
+  }
+  
+  // Attacking
   if (!attacking) {
     attacking = true;
     spriteBeforeAttacking = player.sprite;
     player.sprite = attackSarahAnimation;
     attackSarahAnimation.reset();
     attackSarahAnimation.playOnce();
-  }
-  
-  if (currentDialogue < table.getRowCount() - 1) {
-    TableRow nextRow = table.getRow(currentDialogue + 1);
-    String nextRowScene = nextRow.getString("scene");
-    if (nextRowScene.equals(currentScreen)) {
-      currentDialogue += 1;
-    } else { // End of scene
-      dialogueActive = false; 
-      if (debugMode) println("End of dialogue for " + currentScreen);
-    }
-  } else { // End of CSV
-    dialogueActive = false;
+    return;
   }
 }
 
@@ -467,26 +536,30 @@ void keyPressed() {
   if (key == CODED) {
     if (keyCode == UP) startJump();
     if (keyCode == DOWN) {
-      if (currentDialogue < table.getRowCount() - 1) {
+      if ((currentScreen != "title") && (dialogueActive) && (currentDialogue < table.getRowCount() - 1)) {
+        sfxType.play();
         TableRow nextRow = table.getRow(currentDialogue + 1);
         String nextRowScene = nextRow.getString("scene");
         if (nextRowScene.equals(currentScreen)) {
           currentDialogue += 1;
+          return;  
         } else { // End of scene
           dialogueActive = false; 
           if (debugMode) println("End of dialogue for " + currentScreen);
+          return;
         }
       } else { // End of CSV
         dialogueActive = false;
+        if (debugMode) println("End of CSV and dialogue for " + currentScreen);
+        return;
       }
-      sfxType.play(); // It'll always play, sadly
     }
     if (keyCode == LEFT) {
       left = true; 
       if (!attacking && !jumping) {
         player.sprite = runSarahAnimation;
         runSarahAnimation.reset();
-        sfxStep.play();
+        running = true;
       }
     }
     if (keyCode == RIGHT) {
@@ -494,7 +567,7 @@ void keyPressed() {
       if (!attacking && !jumping) {
         player.sprite = runSarahAnimation;
         runSarahAnimation.reset();
-        sfxStep.play();
+        running = true;
       }
     }
   }
@@ -503,7 +576,7 @@ void keyPressed() {
     if (!attacking && !jumping) {
       player.sprite = runSarahAnimation;
       runSarahAnimation.reset();
-      sfxStep.play();
+      running = true;
     }
   }
   if (key == 'd' || key == 'D') {
@@ -511,7 +584,7 @@ void keyPressed() {
     if (!attacking && !jumping) {
       player.sprite = runSarahAnimation;
       runSarahAnimation.reset();
-      sfxStep.play();
+      running = true;
     }
   }
   if (key == ' ' || key == 'w' || key == 'W') startJump();
@@ -534,6 +607,7 @@ void keyReleased() {
       if (!attacking && !jumping) {
         player.sprite = idleSarahAnimation;
         idleSarahAnimation.reset();
+        running = false;
       }
     }
     if (keyCode == RIGHT) {
@@ -541,6 +615,7 @@ void keyReleased() {
       if (!attacking && !jumping) {
         player.sprite = idleSarahAnimation;
         idleSarahAnimation.reset();
+        running = false;
       }
     }
   }
@@ -549,6 +624,7 @@ void keyReleased() {
     if (!attacking && !jumping) {
       player.sprite = idleSarahAnimation;
       idleSarahAnimation.reset();
+      running = false;
     }
   }
   if (key == 'd' || key == 'D') {
@@ -556,6 +632,7 @@ void keyReleased() {
     if (!attacking && !jumping) {
       player.sprite = idleSarahAnimation;
       idleSarahAnimation.reset();
+      running = false;
     }
   }
 }
