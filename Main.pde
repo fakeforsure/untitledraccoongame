@@ -9,6 +9,7 @@
 
 // Imports
 import java.util.HashMap;
+import processing.sound.*;
 
 // Debug Mode
 boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
@@ -19,6 +20,7 @@ Player richard;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
 HashMap<String, PImage> portraits = new HashMap<String, PImage>();
 Table table;
+SoundFile sfxJump, sfxStep, sfxLaugh, sfxType;
 
 // - Animation
 // -- Sarah
@@ -151,7 +153,7 @@ void setup() {
   portraits.put("talkSarah", talkSarah);
   portraits.put("talkSarahMad", talkSarahMad);
   // - Richard
-  talkRichard = loadImage("richard/playerRichard_placeholder"); // To change?
+  talkRichard = loadImage("richard/talkRichard_Placeholder.png"); // To change?
   // - King Fat
   kingFatHead = loadImage("kingfat/King_fatty_fat_arms.png");
   kingFatBellay = loadImage("kingfat/King_fatty_fat_bellay.png");
@@ -164,7 +166,7 @@ void setup() {
   
   // Setup Scene Images
   tree = loadImage("bg/evil_tree_of_pure_evil_mueheheh.png");
-  upass = loadImage("projectile/upass.png"); // Projectile cuz it gets thrown to the player at the end
+  upass = loadImage("projectiles/upass.png"); // Projectile cuz it gets thrown to the player at the end
   bgScene1_Room = loadImage("bg/bgScene1_Room.png");
   bgScene2_BusOut = loadImage("bg/bgScene2_BusOut.png");
   bgScene2_BusIn = loadImage("bg/bgScene2_BusIn.png");
@@ -189,6 +191,12 @@ void setup() {
   // - Arrow Down
   for (int i = 0; i < key_down.length; i++) key_down[i] = loadImage("key/keyboard_arrow_down_"+i+".png");
   downAnimation = new AnimatedSprite(key_down, 300);
+  
+  // Setup Sound
+  sfxJump = new SoundFile(this, "sfx/Sarah/Sarah Jump.wav");
+  sfxStep = new SoundFile(this, "sfx/General/Stepping.wav");
+  sfxLaugh = new SoundFile(this, "sfx/Enemies/Richard Laugh.wav");
+  sfxType = new SoundFile(this, "sfx/General/Typewriter.mp3");
 }
 
 void draw() {
@@ -380,6 +388,7 @@ void startJump() {
   }
   player.velocity.y = -jumpPower;
   jumping = true;
+  sfxJump.play();
   player.sprite = jumpSarahAnimation;
   jumpSarahAnimation.reset();
   jumpSarahAnimation.playOnce();
@@ -470,12 +479,14 @@ void keyPressed() {
       } else { // End of CSV
         dialogueActive = false;
       }
+      sfxType.play(); // It'll always play, sadly
     }
     if (keyCode == LEFT) {
       left = true; 
       if (!attacking && !jumping) {
         player.sprite = runSarahAnimation;
         runSarahAnimation.reset();
+        sfxStep.play();
       }
     }
     if (keyCode == RIGHT) {
@@ -483,6 +494,7 @@ void keyPressed() {
       if (!attacking && !jumping) {
         player.sprite = runSarahAnimation;
         runSarahAnimation.reset();
+        sfxStep.play();
       }
     }
   }
@@ -491,6 +503,7 @@ void keyPressed() {
     if (!attacking && !jumping) {
       player.sprite = runSarahAnimation;
       runSarahAnimation.reset();
+      sfxStep.play();
     }
   }
   if (key == 'd' || key == 'D') {
@@ -498,6 +511,7 @@ void keyPressed() {
     if (!attacking && !jumping) {
       player.sprite = runSarahAnimation;
       runSarahAnimation.reset();
+      sfxStep.play();
     }
   }
   if (key == ' ' || key == 'w' || key == 'W') startJump();
