@@ -4,31 +4,27 @@
 
 // THIS IS WHERE WE WILL EDIT DIALOGUE
 void dialogue() {
-  // Restart the typewriter effect when the dialogue changes
-  if (currentDialogue != lastDialogue) {
-    lastDialogue = currentDialogue;
-    dialogueStartTime = millis();
-  }
+  if (!dialogueActive) return; 
+  if (currentDialogue >= table.getRowCount()) return;
 
-  switch (currentDialogue) {
-    case 1:
-      textBox(
-        talkSarah,
-        "Sarah",
-        "What the fuck? Why am I in a video game??!"
-      );
-      break;
+  TableRow currentRow = table.getRow(currentDialogue);
+  String dialogueScene = currentRow.getString("scene");
 
-    case 2:
-      textBox(
-        talkSarah,
-        "Sarah",
-        "Fuck it's first day of university I'm gonna be late..."
-      );
-      break;
+  if (dialogueScene.equals(currentScreen)) {
+    String currentVoice = currentRow.getString("voice_id");
+    String currentImage = currentRow.getString("image"); 
+    String currentName = currentRow.getString("name");
+    String currentBody = currentRow.getString("body");
+  
+    if (currentDialogue != lastDialogue) {
+      lastDialogue = currentDialogue;
+      dialogueStartTime = millis();
+    }
+  
+    PImage portraitToDraw = portraits.get(currentImage);
+    textBox(portraitToDraw, currentName, currentBody);
   }
 }
-
 
 void textBox(PImage image, String name, String body) {
   int elapsedTime = millis() - dialogueStartTime;
@@ -44,7 +40,7 @@ void textBox(PImage image, String name, String body) {
   popMatrix();
   pushMatrix();
   translate(100, 2*height/3);
-  image(image, 0, 0, 200, 200);
+  if (image != null) image(image, 0, 0, 200, 200);
   if (debugMode) {
     noFill();
     strokeWeight(1);

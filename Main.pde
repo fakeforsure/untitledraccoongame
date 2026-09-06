@@ -2,11 +2,17 @@
 // By: Team Raccoon
 // On: September 4, 2026
 
+// Imports
+import java.util.HashMap;
+
 // Debug Mode
-boolean debugMode = true; // TO SET FALSE WHEN PUBLISHING
+boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
+ArrayList<Platform> platforms = new ArrayList<Platform>();
+HashMap<String, PImage> portraits = new HashMap<String, PImage>();
+Table table;
 
 // - Animation
 AnimatedSprite idleSarahAnimation;
@@ -14,7 +20,6 @@ AnimatedSprite jumpSarahAnimation;
 AnimatedSprite runSarahAnimation;
 AnimatedSprite attackSarahAnimation;
 AnimatedSprite spriteBeforeAttacking; // For Sarah only
-ArrayList<Platform> platforms = new ArrayList<Platform>();
 AnimatedSprite fAnimation; // F key
 AnimatedSprite downAnimation; // Arrow Down key
 AnimatedSprite talkSarahAnimation;
@@ -27,11 +32,11 @@ boolean attacking = false;
 boolean jumping = false;
 
 // Dialogue Variables
-int currentDialogue = 1;
-int lastDialogue = 0;
+int currentDialogue = 0;
+int lastDialogue = -1;
 int dialogueStartTime = 0;
 int charsPerSecond = 35;
-
+boolean dialogueActive = true;
 
 // Key Variables
 boolean left = false;
@@ -79,8 +84,17 @@ void setup() {
   frameRate(60);
   smooth();
   
-  // Setup Font
+  // Setup Text Stuff
   font = createFont("Determination.ttf", 128);
+  table = loadTable("dialogue.csv", "header");
+  if (debugMode) println(table.getRowCount() + " total rows in table");
+  for (TableRow row : table.rows()) {
+    String voice_id = row.getString("voice_id");
+    String image = row.getString("image");
+    String name = row.getString("name");
+    String body = row.getString("body");
+    if (debugMode) println(name + " says " + body + " with an image of " + image + " and Voice ID of " + voice_id);
+  }
   
   // Setup Player
   // - Idle
@@ -103,6 +117,8 @@ void setup() {
   }
   talkSarah = talkSarahFrames[0];
   talkSarahMad = loadImage("sarah/talkSarah_Mad.png");
+  portraits.put("talkSarah", talkSarah);
+  portraits.put("talkSarahMad", talkSarahMad);
 
   // Setup Player Location
   PVector playerStart = new PVector(1080, 560);
@@ -295,6 +311,15 @@ void enterDoor(String nextScreen, int x, int y) {
   platforms.clear();
   player.position.set(x, y);
   player.velocity.set(0, 0);
+  
+  // Start the next scene dialogue if applicable
+  for (int i = 0; i < table.getRowCount(); i++) {
+    if (table.getRow(i).getString("scene").equals(nextScreen)) {
+      currentDialogue = i;
+      dialogueActive = true;
+      break;
+    }
+  }
 }
 
 // On mouse press
@@ -309,6 +334,19 @@ void mousePressed() {
     attackSarahAnimation.reset();
     attackSarahAnimation.playOnce();
   }
+  
+  if (currentDialogue < table.getRowCount() - 1) {
+    TableRow nextRow = table.getRow(currentDialogue + 1);
+    String nextRowScene = nextRow.getString("scene");
+    if (nextRowScene.equals(currentScreen)) {
+      currentDialogue += 1;
+    } else { // End of scene
+      dialogueActive = false; 
+      if (debugMode) println("End of dialogue for " + currentScreen);
+    }
+  } else { // End of CSV
+    dialogueActive = false;
+  }
 }
 
 // On key press
@@ -316,7 +354,20 @@ void keyPressed() {
   // Moving
   if (key == CODED) {
     if (keyCode == UP) startJump();
-    if (keyCode == DOWN) currentDialogue += 1;
+    if (keyCode == DOWN) {
+      if (currentDialogue < table.getRowCount() - 1) {
+        TableRow nextRow = table.getRow(currentDialogue + 1);
+        String nextRowScene = nextRow.getString("scene");
+        if (nextRowScene.equals(currentScreen)) {
+          currentDialogue += 1;
+        } else { // End of scene
+          dialogueActive = false; 
+          if (debugMode) println("End of dialogue for " + currentScreen);
+        }
+      } else { // End of CSV
+        dialogueActive = false;
+      }
+    }
     if (keyCode == LEFT) {
       left = true; 
       if (!attacking && !jumping) {
