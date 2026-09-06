@@ -21,8 +21,6 @@ HashMap<String, PImage> portraits = new HashMap<String, PImage>();
 Table table;
 
 // - Animation
-AnimatedSprite fAnimation; // F key
-AnimatedSprite downAnimation; // Arrow Down key
 // -- Sarah
 AnimatedSprite idleSarahAnimation;
 AnimatedSprite jumpSarahAnimation;
@@ -33,6 +31,10 @@ AnimatedSprite talkSarahAnimation;
 // -- Richard
 AnimatedSprite idleRichardAnimation;
 AnimatedSprite runRichardAnimation;
+// -- Misc
+AnimatedSprite fAnimation; // F key
+AnimatedSprite downAnimation; // Arrow Down key
+AnimatedSprite projectileBombAnimation; // Da bomb
 
 // Change Varibales
 String currentScreen = "scene1";
@@ -59,15 +61,19 @@ PImage[] playerSarahRun = new PImage[6];
 PImage[] playerSarahAttack = new PImage[6];
 PImage[] playerRichardIdle = new PImage[2];
 PImage[] playerRichardRun = new PImage[4];
-PImage kingFatHead, kingFatBellay, kingFatArms;
 
 // Talk Image Variables
+// - Sarah
 int talkSarahTotalFrames = 2;
 PImage[] talkSarahFrames = new PImage[talkSarahTotalFrames];
 int talkSarahCurrentFrame = 0;
 PImage talkSarah, talkSarahMad;
+// - Others
+PImage talkRichard;
+PImage kingFatHead, kingFatBellay, kingFatArms; // Just his head talks, thankfully...
 
 // Other Image Varibles
+PImage tree, upass;
 PImage bgScene1_Room;
 PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
 PImage bgScene3_City, bgScene3_Concourse, bgScene3_Skytrain, bgScene3_Throneroom;
@@ -144,6 +150,8 @@ void setup() {
   talkSarahMad = loadImage("sarah/talkSarah_Mad.png");
   portraits.put("talkSarah", talkSarah);
   portraits.put("talkSarahMad", talkSarahMad);
+  // - Richard
+  talkRichard = loadImage("richard/playerRichard_placeholder"); // To change?
   // - King Fat
   kingFatHead = loadImage("kingfat/King_fatty_fat_arms.png");
   kingFatBellay = loadImage("kingfat/King_fatty_fat_bellay.png");
@@ -155,6 +163,8 @@ void setup() {
   player.sprite = idleSarahAnimation;
   
   // Setup Scene Images
+  tree = loadImage("bg/evil_tree_of_pure_evil_mueheheh.png");
+  upass = loadImage("projectile/upass.png"); // Projectile cuz it gets thrown to the player at the end
   bgScene1_Room = loadImage("bg/bgScene1_Room.png");
   bgScene2_BusOut = loadImage("bg/bgScene2_BusOut.png");
   bgScene2_BusIn = loadImage("bg/bgScene2_BusIn.png");
@@ -168,7 +178,11 @@ void setup() {
   bgScene5_UnderHackathon = loadImage("bg/bgScene5_UnderHackathon.png");
   bgScene5_WMC = loadImage("bg/bgScene5_WMC.png");
   
-  // Keyboard Images
+  // Setup Projectiles Images
+  for (int i = 0; i < projectileBomb.length; i++) projectileBomb[i] = loadImage("projectiles/bomb_"+i+".png");
+  projectileBombAnimation = new AnimatedSprite(projectileBomb, 100);
+  
+  // Setup Keyboard Images
   // - F
   for (int i = 0; i < key_f.length; i++) key_f[i] = loadImage("key/keyboard_f_"+i+".png");
   fAnimation = new AnimatedSprite(key_f, 300);
@@ -242,19 +256,71 @@ void draw() {
       }
       break; // XXX FOR NOW
     case "scene3":
+      background(bgScene3_Skytrain);
       // Black fades out, arrive at Skytrain station by bus, student chases racoon into sewer
       // Gameplay: platformer, defeat racoon, get back UPass
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 450, 1280, 64, 0, #F7A707);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
     case "scene4":
+      background(bgScene4_BusLoop);
       // Student finally arrives on campus, lost, ask student for direction
       // Gameplay: moving character WASD
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 450, 1280, 64, 0, #00FF00);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
       break; // XXX FOR NOW
     case "scene5":
+      background(bgScene5_UnderHackathon);
       // Student needs to get to class on time
       // Gameplay: platformer (copy pasted), to class
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 450, 1280, 64, 0, #FF00FF);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
       break; // XXX FOR NOW
     case "scene6":
+      background(bgScene5_WMC);
       // Arrive at classroom in AQ, but the racoon is there
       // Gameplay: Mostly moving character WASD + story wrapup
+      
+      // Platform
+      platforms.clear();
+      // - Make Platform (addPlatform(x, y, w, h, color);
+      addPlatform(0, 450, 1280, 64, 0, #00FFFF);
+      // - Draw Platform (only when in debug mode)
+      if (debugMode) {
+        for (Platform platform : platforms) {
+          platform.drawPlatform();
+          platform.drawCollisionBox();
+        }
+      }
       break; // XXX FOR NOW
   }
   
