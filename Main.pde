@@ -346,7 +346,7 @@ void draw() {
        // Platform
       platforms.clear();
       // - Make Platform (addPlatform(x, y, w, h, color);
-      addPlatform(0, 450, 1280, 64, 0, #FFFF00);
+      addPlatform(-100, 460, 1480, 100, 0, #FFFF00);
       // - Draw Platform (only when in debug mode)
       if (debugMode) {
         fill(#00FF00);
@@ -375,7 +375,7 @@ void draw() {
         }
       }
       if (busState == 1) {
-        fAnimation.display(busTargetX, -1*busY/4, false, 64);
+        fAnimation.display(busTargetX+bus.width/2, busY-35, false, 64);
         fAnimation.update();
       }
       if (busState == 2) {
