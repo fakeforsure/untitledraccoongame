@@ -408,8 +408,13 @@ void draw() {
       // Black fades out, arrive at Skytrain station by bus, student chases racoon into sewer
       // Gameplay: platformer, defeat racoon, get back UPass
       
+      image(bgScene3_City,0,0);
+      image(bgScene3_SewerEntrance,0,0);
+      image(bgScene3_SewerCave,0,0);
+      image(bgScene3_Throneroom,0,0);
       // Platform
       platforms.clear();
+      
       // - Make Platform (addPlatform(x, y, w, h, color);
       addPlatform(0, 450, 1280, 64, 0, #F7A707);
       // - Draw Platform (only when in debug mode)
@@ -447,6 +452,12 @@ void draw() {
       background(bgScene5_AQEntrance);
       // Student needs to get to class on time
       // Gameplay: platformer (copy pasted), to class
+      image(bgScene5_UnderHackathon,0,0);
+      image(bgScene3_Concourse,0,0);
+      image(bgScene5_WMC ,0,0);
+      image(bgScene5_AQEntrance,0,0);
+
+      
       
       // Platform
       platforms.clear();
