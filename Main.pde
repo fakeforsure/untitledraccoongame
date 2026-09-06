@@ -12,7 +12,7 @@ import java.util.HashMap;
 import processing.sound.*;
 
 // Debug Mode
-boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
+final boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
@@ -21,7 +21,17 @@ ArrayList<Platform> platforms = new ArrayList<Platform>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 HashMap<String, PImage> portraits = new HashMap<String, PImage>();
 Table table;
-SoundFile sfxJump, sfxStep, sfxLaugh, sfxType;
+
+// Sound Variables
+// - Sarah
+SoundFile sfxJump;
+// - Music
+SoundFile musMercury;
+// - General
+SoundFile sfxClick, sfxExplosion, sfxInteract, sfxKingType, sfxStep, sfxType;
+// - Enemies
+SoundFile sfxBombThrow, sfxKingDie, sfxKingGroan, sfxKingLaugh, sfxKingOof;
+SoundFile sfxRichardDie, sfxRichardLaugh, sfxRichardOof;
 
 // - Animation
 // -- Sarah
@@ -82,6 +92,7 @@ PImage tree, upass;
 PImage bgScene1_Room;
 PImage bgScene2_BusOut, bgScene2_BusIn, bgScene2_BusStop;
 PImage bgScene3_City, bgScene3_Concourse, bgScene3_Skytrain, bgScene3_Throneroom;
+PImage bgScene3_SewerEntrance, bgScene3_SewerCave;
 PImage bgScene4_BusLoop;
 PImage bgScene5_AQEntrance, bgScene5_UnderHackathon, bgScene5_WMC;
 PImage bgScene6_LectureHall;
@@ -95,18 +106,25 @@ int currentText = 0;
 
 // Scene Doors
 boolean playerAtDoor = false;
-
 // - Scene 1
-float doorX = 227;
-float doorY = 284;
-float doorW = 92;
-float doorH = 132;
+final float doorX = 227;
+final float doorY = 284;
+final float doorW = 92;
+final float doorH = 132;
+// - Scene 2
+PImage bus;
+float busX;
+float busY;
+float busTargetX;
+float busSpeed = 8;
+int busState = 0;
+float busSceneOpacity = 255;
+float busFadeSpeed = 5;
 
 // Setup
 void setup() {
   // Setup Screen
-  fullScreen(P2D);
-  surface.setSize(1280, 720);
+  size(1280, 720, P2D);
   surface.setLocation(displayWidth/2 - width/2, displayHeight/2 - height/2);
   surface.setTitle("Untitle Racoon Game");
   surface.setResizable(false);
@@ -182,11 +200,18 @@ void setup() {
   bgScene3_Concourse = loadImage("bg/bgScene3_Concourse.png");
   bgScene3_Skytrain = loadImage("bg/bgScene3_Skytrain.png");
   bgScene3_Throneroom = loadImage("bg/bgScene3_Throneroom.png");
+  bgScene3_SewerEntrance = loadImage("bg/bgScene3_sewerenterence.png");
+  bgScene3_SewerCave = loadImage("bg/bgScene3_City.png");
   bgScene4_BusLoop = loadImage("bg/bgScene4_BusLoop.png");
   bgScene5_AQEntrance = loadImage("bg/bgScene5_AQEntrance.png");
   bgScene5_UnderHackathon = loadImage("bg/bgScene5_UnderHackathon.png");
   bgScene5_WMC = loadImage("bg/bgScene5_WMC.png");
   bgScene6_LectureHall = loadImage("bg/bgScene6_lecturehall.png");
+  // - Bus
+  bus = bgScene2_BusOut;
+  busX = -800; 
+  busY = 300;
+  busTargetX = 450; 
   
   // Setup Projectiles Images
   for (int i = 0; i < projectileBomb.length; i++) projectileBomb[i] = loadImage("projectiles/bomb_"+i+".png");
@@ -202,9 +227,21 @@ void setup() {
   
   // Setup Sound
   sfxJump = new SoundFile(this, "sfx/Sarah/Sarah Jump.wav");
+  musMercury = new SoundFile(this, "sfx/Music/Mercury.mp3");
+  sfxClick = new SoundFile(this, "sfx/General/Click.mp3");
+  sfxExplosion = new SoundFile(this, "sfx/General/Explosion.mp3");
+  sfxInteract = new SoundFile(this, "sfx/General/interact.wav");
+  sfxKingType = new SoundFile(this, "sfx/General/King Typewriter.wav");
   sfxStep = new SoundFile(this, "sfx/General/Stepping.wav");
-  sfxLaugh = new SoundFile(this, "sfx/Enemies/Richard Laugh.wav");
   sfxType = new SoundFile(this, "sfx/General/Typewriter.mp3");
+  sfxBombThrow = new SoundFile(this, "sfx/Enemies/Bomb Throw.wav");
+  sfxKingDie = new SoundFile(this, "sfx/Enemies/King Die.wav");
+  sfxKingGroan = new SoundFile(this, "sfx/Enemies/King groan.wav");
+  sfxKingLaugh = new SoundFile(this, "sfx/Enemies/King Laugh.wav");
+  sfxKingOof = new SoundFile(this, "sfx/Enemies/King oof.wav");
+  sfxRichardDie = new SoundFile(this, "sfx/Enemies/Richard Die.wav");
+  sfxRichardLaugh = new SoundFile(this, "sfx/Enemies/Richard Laugh.wav");
+  sfxRichardOof = new SoundFile(this, "sfx/Enemies/Richard oof.wav");
 }
 
 void draw() {
@@ -300,28 +337,69 @@ void draw() {
       playerMove();
       break;
     case "scene2":
-      background(bgScene2_BusStop);
+      background(0);
+      if (busState != 2) image(bgScene2_BusStop, 0, 0);
+      //else image(bgScene3_Skytrain, 0, 0);
       // At bus stop, racoon steals UPass, so player takes the bus, fade to black
       // Gameplay: moving character WASD
-      
-      // Platform
+  
+       // Platform
       platforms.clear();
       // - Make Platform (addPlatform(x, y, w, h, color);
       addPlatform(0, 450, 1280, 64, 0, #FFFF00);
       // - Draw Platform (only when in debug mode)
       if (debugMode) {
+        fill(#00FF00);
+        rectMode(CORNER);
+        rect(busX, busY, bus.width, bus.height);
         for (Platform platform : platforms) {
           platform.drawPlatform();
           platform.drawCollisionBox();
         }
       }
       
-      // Enemy
-      richard.update(player);
-      richard.drawCharacter();
-      checkBagHitEnemy(richard, player);
+      // Bus
+      if (busState < 3) {
+        tint(255, 255); 
+        image(bgScene2_BusStop, 0, 0);
+      } else if (busState == 3) {
+        tint(255, busSceneOpacity); 
+        image(bgScene3_Skytrain, 0, 0);
+      }
+      if (busState == 0) {
+        if (busX < busTargetX) {
+          busX += busSpeed;
+        } else {
+          busX = busTargetX;
+          busState = 1;
+        }
+      }
+      if (busState == 1) {
+        fAnimation.display(busTargetX, -1*busY/4, false, 64);
+        fAnimation.update();
+      }
+      if (busState == 2) {
+        busX += busSpeed;
+        busSceneOpacity -= busFadeSpeed;
+        if (busSceneOpacity <= 0) {
+          busSceneOpacity = 0;
+          busState = 3;
+        }
+      }
+      if (busState == 3) {
+        busSceneOpacity += busFadeSpeed;
+        if (busSceneOpacity >= 255) {
+          busSceneOpacity = 255;
+        }
+      }
+      if (busState < 3) {
+        tint(255, busSceneOpacity); 
+        image(bus, busX, busY);
+      }
+      noTint(); 
       
-      // Player (always at bottom)
+      // Player
+      tint(255, 255); 
       playerMove();
       break;
     case "scene3":
@@ -605,6 +683,9 @@ void keyPressed() {
     if (playerAtDoor) {
       enterDoor("scene2", 100, 380);
       playerAtDoor = false;
+    }
+    if (busState == 1) {
+      busState = 2;
     }
   }
 }

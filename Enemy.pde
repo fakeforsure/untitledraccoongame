@@ -2,6 +2,11 @@
 // By: Team Raccoon
 // On: September 6, 2026
 
+// To spawn a Richard
+//richard.update(player);
+//richard.drawCharacter();
+//checkBagHitEnemy(richard, player);
+
 class BasicEnemy extends Character {
   boolean isDead = false;
   int deathTimer = 0;
@@ -14,6 +19,7 @@ class BasicEnemy extends Character {
   int lastBagSwingID = -1;
   float gravity = 0.8;
   boolean grounded = false;
+  boolean isHealthBar = false;
 
   
   AnimatedSprite sprite;
@@ -71,7 +77,7 @@ class BasicEnemy extends Character {
     
     sprite.update();
     sprite.display(position.x, position.y, false, 100);
-    drawEnemyHealth();
+    if (isHealthBar) drawEnemyHealth();
   }
 
   boolean hitCharacter(Player player) {
