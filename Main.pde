@@ -117,10 +117,10 @@ void setup() {
   
   // Keyboard Images
   // - F
-  for (int i = 0; i < key_f.length; i++) key_f[i] = loadImage("keyboard_f_"+i+".png");
+  for (int i = 0; i < key_f.length; i++) key_f[i] = loadImage("key/keyboard_f_"+i+".png");
   fAnimation = new AnimatedSprite(key_f, 300);
   // - Arrow Down
-  for (int i = 0; i < key_down.length; i++) key_down[i] = loadImage("keyboard_arrow_down_"+i+".png");
+  for (int i = 0; i < key_down.length; i++) key_down[i] = loadImage("key/keyboard_arrow_down_"+i+".png");
   downAnimation = new AnimatedSprite(key_down, 300);
 }
 
