@@ -16,7 +16,7 @@ boolean debugMode = false; // TO SET FALSE WHEN PUBLISHING
 
 // Main Variables
 Player player;
-Player richard;
+BasicEnemy richard;
 ArrayList<Platform> platforms = new ArrayList<Platform>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 HashMap<String, PImage> portraits = new HashMap<String, PImage>();
@@ -164,9 +164,12 @@ void setup() {
   kingFatArms = loadImage("kingfat/King_fatty_fat_head.png");
 
   // Setup Player Location
+  // - Sarah
   PVector playerStart = new PVector(1080, 560);
   player = new Player(playerStart, new PVector(0, 0), 100, 64, 186, playerSarahIdle, 100);
   player.sprite = idleSarahAnimation;
+  // - Richard
+  richard = new BasicEnemy(new PVector(400, 350), new PVector(0, 0), 10, 100, 100);
   
   // Setup Scene Images
   tree = loadImage("bg/evil_tree_of_pure_evil_mueheheh.png");
@@ -312,6 +315,11 @@ void draw() {
           platform.drawCollisionBox();
         }
       }
+      
+      // Enemy
+      richard.update(player);
+      richard.drawCharacter();
+      checkBagHitEnemy(richard, player);
       
       // Player (always at bottom)
       playerMove();
@@ -528,6 +536,7 @@ void mousePressed() {
     player.sprite = attackSarahAnimation;
     attackSarahAnimation.reset();
     attackSarahAnimation.playOnce();
+    player.swingBag();
     return;
   }
 }

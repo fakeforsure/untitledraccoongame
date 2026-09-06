@@ -21,6 +21,15 @@ class Player extends Character {
   }
 
   AnimatedSprite sprite; // Bring in the animation
+  
+  // Sword settings
+  boolean swinging = false;
+  int swingID = 0;
+  int swingTimer = 0;
+  int swingDuration = 15;
+  float bagStart = 25;
+  float bagLength = 100;
+  float bagWidth = 14;
 
   // Constructor
   Player(PVector position, PVector velocity, int health, float width, float height, PImage[] frames, int frameTime) {
@@ -91,12 +100,60 @@ class Player extends Character {
   // https://stackoverflow.com/questions/62028169/how-to-detect-when-rotated-rectangles-are-colliding-each-other
   // https://stackoverflow.com/questions/13464122/rotate-and-translate-in-processing-give-me-headaches
 
+  void swingBag() {
+    if (!swinging) {
+      swinging = true;
+      swingTimer = swingDuration;
+      swingID++;
+    }
+  }
+
+  void updateBag() {
+    if (swinging) {
+      swingTimer--;
+
+      if (swingTimer <= 0) {
+        swingTimer = 0;
+        swinging = false;
+      }
+    }
+  }
+
+  float getBagAngle() {
+    float progress = 1.0 - float(swingTimer) / swingDuration;
+    float angle = radians(70 - progress * 140); // Swings bottom to top
+    if (facingLeft) {
+      angle = PI - angle;
+    }
+    return angle;
+  }
+  
+  void drawBag() {
+    if (!swinging) {
+      return;
+    }
+    
+    float bagAngle = getBagAngle();
+    pushMatrix();
+    translate(position.x, position.y);
+    rotate(bagAngle);
+    noFill();
+    stroke(#FF0000);
+    strokeWeight(1);
+    rectMode(CORNERS);
+    rect(bagStart, -bagWidth/2, bagStart + bagLength, bagWidth/2);
+    popMatrix();
+    rectMode(CORNER);
+  }
+
   void update() {
     moveCharacter();
+    updateBag();
     sprite.update();
   }
 
   void drawCharacter() {
+    if (debugMode) drawBag();
     sprite.display(position.x, position.y, facingLeft, 192);
   }
 }
