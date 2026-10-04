@@ -1,12 +1,29 @@
-Untitled Raccoon Game
+# Untitled Raccoon Game
+In this game, you play as a brand-new SFU student who hates her life.
+<br />
+Oh but watch out for the raccoons, they tend to love to steal your UPass~!!
 
 ---
+---
+
+## Notice
 
 All assets except Input Prompts were made by Team Raccoon for the SFU Game DevxIATSU SummerJam 2026
 
 ---
+---
 
-Input Prompts License
+## Install Instructions
+### Raw link to game: **https://fakeforsureyt.itch.io/untitledraccoongame**
+
+1. Download [the latest release](https://fakeforsureyt.itch.io/untitledraccoongame) from the **itch.io** page,
+2. Extract `.zip` file,
+3. Play directly from the `.exe` file!
+
+---
+---
+
+## Input Prompts License
 
 	Input Prompts (1.4)
 
